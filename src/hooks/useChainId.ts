@@ -9,7 +9,8 @@ import { prefixedAddressRe } from '@/utils/url'
 import useWallet from './wallets/useWallet'
 import useChains from './useChains'
 
-const defaultChainId = IS_PRODUCTION ? chains.eth : chains.gor
+// FIXME: revert this line before merging into safe-global/safe-wallet-web
+const defaultChainId = IS_PRODUCTION ? chains.zksynct : chains.zksynct
 
 // Use the location object directly because Next.js's router.query is available only on mount
 const getLocationQuery = (): ParsedUrlQuery => {
