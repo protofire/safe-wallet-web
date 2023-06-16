@@ -220,7 +220,7 @@ index 27bfd92..9424d4c 100644
      "300": "0xA65387F16B013cf2Af4605Ad8aA5ec25a2cbA3a2",
      "321": "0xA65387F16B013cf2Af4605Ad8aA5ec25a2cbA3a2",
 diff --git a/node_modules/@safe-global/safe-deployments/src/assets/v1.3.0/simulate_tx_accessor.json b/node_modules/@safe-global/safe-deployments/src/assets/v1.3.0/simulate_tx_accessor.json
-index efda7a4..cc04717 100644
+index efda7a4..d0b9208 100644
 --- a/node_modules/@safe-global/safe-deployments/src/assets/v1.3.0/simulate_tx_accessor.json
 +++ b/node_modules/@safe-global/safe-deployments/src/assets/v1.3.0/simulate_tx_accessor.json
 @@ -25,7 +25,7 @@
@@ -232,3 +232,11 @@ index efda7a4..cc04717 100644
      "97": "0x59AD6735bCd8152B84860Cb256dD9e96b85F69Da",
      "100": "0x59AD6735bCd8152B84860Cb256dD9e96b85F69Da",
      "106": "0x727a77a074D1E6c4530e814F89E618a3298FC044",
+@@ -36,6 +36,7 @@
+     "137": "0x59AD6735bCd8152B84860Cb256dD9e96b85F69Da",
+     "246": "0x59AD6735bCd8152B84860Cb256dD9e96b85F69Da",
+     "250": "0x59AD6735bCd8152B84860Cb256dD9e96b85F69Da",
++    "280": "0xD7C05A08cB43e99d596B606A1c03EA2F21289d94",
+     "288": "0x727a77a074D1E6c4530e814F89E618a3298FC044",
+     "300": "0x59AD6735bCd8152B84860Cb256dD9e96b85F69Da",
+     "321": "0x59AD6735bCd8152B84860Cb256dD9e96b85F69Da",
