@@ -1,0 +1,17 @@
+diff --git a/node_modules/@safe-global/safe-core-sdk-utils/dist/src/eip-3770/config.js b/node_modules/@safe-global/safe-core-sdk-utils/dist/src/eip-3770/config.js
+index fe3c79b..4e6c09f 100644
+--- a/node_modules/@safe-global/safe-core-sdk-utils/dist/src/eip-3770/config.js
++++ b/node_modules/@safe-global/safe-core-sdk-utils/dist/src/eip-3770/config.js
+@@ -35,10 +35,12 @@ exports.networks = [
+     { chainId: 137, shortName: 'matic' },
+     { chainId: 246, shortName: 'ewt' },
+     { chainId: 250, shortName: 'ftm' },
++    { chainId: 280, shortName: 'zksync-goerli' },
+     { chainId: 288, shortName: 'boba' },
+     { chainId: 300, shortName: 'ogn' },
+     { chainId: 321, shortName: 'kcs' },
+     { chainId: 322, shortName: 'kcst' },
++    { chainId: 324, shortName: 'zksync' },
+     { chainId: 336, shortName: 'sdn' },
+     { chainId: 338, shortName: 'tcro' },
+     { chainId: 420, shortName: 'ogor' },

@@ -3,6 +3,7 @@ import { Button, Grid, Typography, Divider, Box } from '@mui/material'
 import { lightPalette } from '@safe-global/safe-react-components'
 import ChainIndicator from '@/components/common/ChainIndicator'
 import EthHashInfo from '@/components/common/EthHashInfo'
+import chains from '@/config/chains'
 import { useCurrentChain } from '@/hooks/useChains'
 import useGasPrice from '@/hooks/useGasPrice'
 import { useEstimateSafeCreationGas } from '@/components/new-safe/create/useEstimateSafeCreationGas'
@@ -13,6 +14,7 @@ import css from '@/components/new-safe/create/steps/ReviewStep/styles.module.css
 import layoutCss from '@/components/new-safe/create/styles.module.css'
 import { getReadOnlyFallbackHandlerContract } from '@/services/contracts/safeContracts'
 import { computeNewSafeAddress } from '@/components/new-safe/create/logic'
+import { computeNewSafeAddressZk } from '@/components/new-safe/create/logic/zksync'
 import useWallet from '@/hooks/wallets/useWallet'
 import { useWeb3 } from '@/hooks/wallets/web3'
 import useLocalStorage from '@/services/local-storage/useLocalStorage'
@@ -80,7 +82,10 @@ const ReviewStep = ({ data, onSubmit, onBack, setStep }: StepRenderProps<NewSafe
       },
     }
 
-    const safeAddress = await computeNewSafeAddress(provider, props)
+    const safeAddress =
+      chain.chainId.toString() === chains['zksync-goerli'] || chain.chainId.toString() === chains['zksync']
+        ? await computeNewSafeAddressZk(props, chain)
+        : await computeNewSafeAddress(provider, props)
 
     const pendingSafe = {
       ...data,
