@@ -83,7 +83,7 @@ const ReviewStep = ({ data, onSubmit, onBack, setStep }: StepRenderProps<NewSafe
     }
 
     const safeAddress =
-      chain.chainId === chains.zksynct
+      chain.chainId.toString() === chains['zksync-goerli'] || chain.chainId.toString() === chains['zksync']
         ? await computeNewSafeAddressZk(props, chain)
         : await computeNewSafeAddress(provider, props)
 
