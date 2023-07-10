@@ -3,9 +3,9 @@ import chains from './chains'
 export const IS_PRODUCTION = process.env.NEXT_PUBLIC_IS_PRODUCTION
 
 export const GATEWAY_URL_PRODUCTION =
-  process.env.NEXT_PUBLIC_GATEWAY_URL_PRODUCTION || 'https://gateway.staging-zksync.safe.protofire.io'
+  process.env.NEXT_PUBLIC_GATEWAY_URL_PRODUCTION || 'https://gateway.staging-zksafe.protofire.io'
 export const GATEWAY_URL_STAGING =
-  process.env.NEXT_PUBLIC_GATEWAY_URL_STAGING || 'https://gateway.staging-zksync.safe.protofire.io'
+  process.env.NEXT_PUBLIC_GATEWAY_URL_STAGING || 'https://gateway.staging-zksafe.protofire.io'
 
 // Magic numbers
 export const POLLING_INTERVAL = 15_000
@@ -93,4 +93,4 @@ export const IS_OFFICIAL_HOST = process.env.NEXT_PUBLIC_IS_OFFICIAL_HOST || fals
 
 // Risk mitigation (Redefine)
 export const REDEFINE_SIMULATION_URL = 'https://dashboard.redefine.net/reports/'
-export const REDEFINE_REQUEST_URL = 'https://risk-analysis.safe.global/messages'
+export const REDEFINE_API = process.env.NEXT_PUBLIC_REDEFINE_API
