@@ -6,8 +6,12 @@ import MUILink from '@mui/material/Link'
 import { useAppDispatch, useAppSelector } from '@/store'
 import { closePSABanner, selectPSABanner } from '@/store/bannerSlice'
 
-const BANNERS: Record<string, ReactElement | string> = {
-  '*': (
+type BannerType = {
+  [key: string]: ReactElement | string
+}
+
+const BANNERS: BannerType = {
+  WARNING_BANNER: (
     <>
       ZkSync is now integrated into{' '}
       <Link href="https://app.safe.global" passHref>
@@ -20,16 +24,12 @@ const BANNERS: Record<string, ReactElement | string> = {
     </>
   ),
 }
-
-const WARNING_BANNER = 'WARNING_BANNER'
-
 const PsaBanner = (): ReactElement | null => {
-  const banner = BANNERS['*']
-  const isEnabled = true
+  const banner = BANNERS['WARNING_BANNER']
 
   const dispatch = useAppDispatch()
   const open = useAppSelector(selectPSABanner).open
-  const showBanner = isEnabled && banner && open
+  const showBanner = banner && open
 
   const onClose = () => {
     dispatch(closePSABanner())

@@ -23,8 +23,7 @@
   position: relative;
   display: flex;
   flex-direction: column;
-  alignitems: center;
-  height: 70px;
+  /* height: 70px; */
 }
 
 .content {
