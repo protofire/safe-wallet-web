@@ -1,16 +1,21 @@
-import { type ReactElement, useEffect, useState } from 'react'
+import { type ReactElement } from 'react'
 import CloseIcon from '@mui/icons-material/Close'
-import local from '@/services/local-storage/local'
 import css from './styles.module.css'
+import Link from 'next/link'
+import MUILink from '@mui/material/Link'
+import { useAppDispatch, useAppSelector } from '@/store'
+import { closePSABanner, selectPSABanner } from '@/store/bannerSlice'
 
 const BANNERS: Record<string, ReactElement | string> = {
   '*': (
     <>
       ZkSync is now integrated into{' '}
-      <a href="https://app.safe.global" target="_blank" rel="noreferrer">
-        Safe Global
-      </a>
-      .Please be mindful of transactions that are not yet fully confirmed or not executed. Your Safe can be accessed
+      <Link href="https://app.safe.global" passHref>
+        <MUILink target="_blank" rel="noreferrer">
+          Safe Global
+        </MUILink>
+      </Link>
+      . Please be mindful of transactions that are not yet fully confirmed or not executed. Your Safe can be accessed
       both here and through Safe Global.{' '}
     </>
   ),
@@ -21,20 +26,14 @@ const WARNING_BANNER = 'WARNING_BANNER'
 const PsaBanner = (): ReactElement | null => {
   const banner = BANNERS['*']
   const isEnabled = true
-  const isClosed = local.getItem<boolean>(`${WARNING_BANNER}_closed`) ?? false
 
-  const [closed, setClosed] = useState(isClosed)
-
-  const showBanner = isEnabled && banner && !closed
+  const dispatch = useAppDispatch()
+  const open = useAppSelector(selectPSABanner).open
+  const showBanner = isEnabled && banner && open
 
   const onClose = () => {
-    setClosed(true)
-    local.setItem(`${WARNING_BANNER}_closed`, true)
+    dispatch(closePSABanner())
   }
-
-  useEffect(() => {
-    document.body.setAttribute('data-with-banner', showBanner.toString())
-  }, [showBanner])
 
   return showBanner ? (
     <div className={css.banner}>
