@@ -9,6 +9,7 @@ import SideDrawer from './SideDrawer'
 import { AppRoutes } from '@/config/routes'
 import useDebounce from '@/hooks/useDebounce'
 import { useRouter } from 'next/router'
+import PsaBanner from '../PsaBanner'
 
 const isNoSidebarRoute = (pathname: string): boolean => {
   return [
@@ -39,6 +40,7 @@ const PageLayout = ({ pathname, children }: { pathname: string; children: ReactE
 
   return (
     <>
+      <PsaBanner />
       <header className={css.header}>
         <Header onMenuToggle={noSidebar ? undefined : setSidebarOpen} />
       </header>
