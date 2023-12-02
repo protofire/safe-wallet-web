@@ -65,6 +65,7 @@
     "@web3-onboard/injected-wallets": "^2.10.7",
     "@web3-onboard/keystone": "^2.3.7",
     "@web3-onboard/ledger": "2.3.2",
+    "@web3-onboard/magic": "^2.1.7",
     "@web3-onboard/trezor": "^2.4.2",
     "@web3-onboard/walletconnect": "^2.4.7",
     "blo": "^1.1.1",

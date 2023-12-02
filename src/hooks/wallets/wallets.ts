@@ -1,4 +1,4 @@
-import { CYPRESS_MNEMONIC, TREZOR_APP_URL, TREZOR_EMAIL, WC_PROJECT_ID } from '@/config/constants'
+import { CYPRESS_MNEMONIC, TREZOR_APP_URL, TREZOR_EMAIL, WC_PROJECT_ID, MAGIC_API_KEY } from '@/config/constants'
 import type { RecommendedInjectedWallets, WalletInit } from '@web3-onboard/common/dist/types.d'
 import type { ChainInfo } from '@safe-global/safe-gateway-typescript-sdk'
 
@@ -8,6 +8,7 @@ import keystoneModule from '@web3-onboard/keystone/dist/index'
 import ledgerModule from '@web3-onboard/ledger/dist/index'
 import trezorModule from '@web3-onboard/trezor'
 import walletConnect from '@web3-onboard/walletconnect'
+import magicModule from '@web3-onboard/magic'
 
 import pairingModule from '@/services/pairing/module'
 import e2eWalletModule from '@/tests/e2e-wallet'
@@ -45,6 +46,7 @@ const WALLET_MODULES: { [key in WALLET_KEYS]: (chain: ChainInfo) => WalletInit }
   [WALLET_KEYS.LEDGER]: () => ledgerModule(),
   [WALLET_KEYS.TREZOR]: () => trezorModule({ appUrl: TREZOR_APP_URL, email: TREZOR_EMAIL }),
   [WALLET_KEYS.KEYSTONE]: () => keystoneModule(),
+  [WALLET_KEYS.MAGIC]: () => magicModule({ apiKey: MAGIC_API_KEY }),
 }
 
 export const getAllWallets = (chain: ChainInfo): WalletInit[] => {
