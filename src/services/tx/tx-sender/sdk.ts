@@ -1,19 +1,21 @@
 import { getSafeSDK } from '@/hooks/coreSDK/safeCoreSDK'
-import type Safe from '@safe-global/safe-core-sdk'
-import EthersAdapter from '@safe-global/safe-ethers-lib'
+import type Safe from '@safe-global/protocol-kit'
+import { EthersAdapter, SigningMethod } from '@safe-global/protocol-kit'
+import type { Eip1193Provider, JsonRpcSigner } from 'ethers'
 import { ethers } from 'ethers'
-import { isWalletRejection, isHardwareWallet } from '@/utils/wallets'
+import { isWalletRejection, isHardwareWallet, isWalletConnect } from '@/utils/wallets'
 import { OperationType, type SafeTransaction } from '@safe-global/safe-core-sdk-types'
-import type { SafeInfo } from '@safe-global/safe-gateway-typescript-sdk'
-import { SAFE_FEATURES } from '@safe-global/safe-core-sdk-utils'
+import { getChainConfig, type SafeInfo } from '@safe-global/safe-gateway-typescript-sdk'
+import { SAFE_FEATURES } from '@safe-global/protocol-kit/dist/src/utils/safeVersions'
 import { hasSafeFeature } from '@/utils/safe-versions'
 import { createWeb3 } from '@/hooks/wallets/web3'
-import { hexValue } from 'ethers/lib/utils'
+import { toQuantity } from 'ethers'
 import { connectWallet, getConnectedWallet } from '@/hooks/wallets/useOnboard'
 import { type OnboardAPI } from '@web3-onboard/core'
-import type { ConnectedWallet } from '@/services/onboard'
-import type { JsonRpcSigner } from '@ethersproject/providers'
+import type { ConnectedWallet } from '@/hooks/wallets/useOnboard'
 import { asError } from '@/services/exceptions/utils'
+import { UncheckedJsonRpcSigner } from '@/utils/providers/UncheckedJsonRpcSigner'
+import get from 'lodash/get'
 
 export const getAndValidateSafeSDK = (): Safe => {
   const safeSDK = getSafeSDK()
@@ -25,28 +27,59 @@ export const getAndValidateSafeSDK = (): Safe => {
   return safeSDK
 }
 
+async function switchOrAddChain(walletProvider: ConnectedWallet['provider'], chainId: string): Promise<void> {
+  const UNKNOWN_CHAIN_ERROR_CODE = 4902
+  const hexChainId = toQuantity(parseInt(chainId))
+
+  try {
+    return await walletProvider.request({
+      method: 'wallet_switchEthereumChain',
+      params: [{ chainId: hexChainId }],
+    })
+  } catch (error) {
+    const errorCode = get(error, 'code') as number | undefined
+
+    // Rabby emits the same error code as MM, but it is nested
+    const nestedErrorCode = get(error, 'data.originalError.code') as number | undefined
+
+    if (errorCode === UNKNOWN_CHAIN_ERROR_CODE || nestedErrorCode === UNKNOWN_CHAIN_ERROR_CODE) {
+      const chain = await getChainConfig(chainId)
+
+      return walletProvider.request({
+        method: 'wallet_addEthereumChain',
+        params: [
+          {
+            chainId: hexChainId,
+            chainName: chain.chainName,
+            nativeCurrency: chain.nativeCurrency,
+            rpcUrls: [chain.publicRpcUri.value],
+            blockExplorerUrls: [new URL(chain.blockExplorerUriTemplate.address).origin],
+          },
+        ],
+      })
+    }
+
+    throw error
+  }
+}
+
 export const switchWalletChain = async (onboard: OnboardAPI, chainId: string): Promise<ConnectedWallet | null> => {
   const currentWallet = getConnectedWallet(onboard.state.get().wallets)
+  if (!currentWallet) return null
 
-  if (!currentWallet) {
-    return null
-  }
-
-  if (isHardwareWallet(currentWallet)) {
-    await onboard.disconnectWallet({ label: currentWallet.label })
-    const wallets = await connectWallet(onboard, { autoSelect: currentWallet.label })
-
-    return wallets ? getConnectedWallet(wallets) : null
-  }
-
-  const didSwitch = await onboard.setChain({ chainId: hexValue(parseInt(chainId)) })
-  if (!didSwitch) {
+  // Onboard incorrectly returns WalletConnect's chainId, so it needs to be switched unconditionally
+  if (currentWallet.chainId === chainId && !isWalletConnect(currentWallet)) {
     return currentWallet
   }
 
-  /**
-   * Onboard doesn't update immediately and otherwise returns a stale wallet if we directly get its state
-   */
+  // Hardware wallets cannot switch chains
+  if (isHardwareWallet(currentWallet)) {
+    await onboard.disconnectWallet({ label: currentWallet.label })
+    const wallets = await connectWallet(onboard, { autoSelect: currentWallet.label })
+    return wallets ? getConnectedWallet(wallets) : null
+  }
+
+  // Onboard doesn't update immediately and otherwise returns a stale wallet if we directly get its state
   return new Promise((resolve) => {
     const source$ = onboard.state.select('wallets').subscribe((newWallets) => {
       const newWallet = getConnectedWallet(newWallets)
@@ -54,6 +87,12 @@ export const switchWalletChain = async (onboard: OnboardAPI, chainId: string): P
         source$.unsubscribe()
         resolve(newWallet)
       }
+    })
+
+    // Switch chain for all other wallets
+    switchOrAddChain(currentWallet.provider, chainId).catch(() => {
+      source$.unsubscribe()
+      resolve(currentWallet)
     })
   })
 }
@@ -63,10 +102,6 @@ export const assertWalletChain = async (onboard: OnboardAPI, chainId: string): P
 
   if (!wallet) {
     throw new Error('No wallet connected.')
-  }
-
-  if (wallet.chainId === chainId) {
-    return wallet
   }
 
   const newWallet = await switchWalletChain(onboard, chainId)
@@ -82,13 +117,14 @@ export const assertWalletChain = async (onboard: OnboardAPI, chainId: string): P
   return newWallet
 }
 
-export const getAssertedChainSigner = async (
-  onboard: OnboardAPI,
-  chainId: SafeInfo['chainId'],
-): Promise<JsonRpcSigner> => {
-  const wallet = await assertWalletChain(onboard, chainId)
-  const provider = createWeb3(wallet.provider)
-  return provider.getSigner()
+export const getAssertedChainSigner = async (provider: Eip1193Provider): Promise<JsonRpcSigner> => {
+  const browserProvider = createWeb3(provider)
+  return browserProvider.getSigner()
+}
+
+export const getUncheckedSigner = async (provider: Eip1193Provider) => {
+  const browserProvider = createWeb3(provider)
+  return new UncheckedJsonRpcSigner(browserProvider, (await browserProvider.getSigner()).address)
 }
 
 /**
@@ -97,20 +133,23 @@ export const getAssertedChainSigner = async (
  * most of the values of transactionResponse which is needed when
  * dealing with smart-contract wallet owners
  */
-export const getUncheckedSafeSDK = async (onboard: OnboardAPI, chainId: SafeInfo['chainId']): Promise<Safe> => {
-  const signer = await getAssertedChainSigner(onboard, chainId)
+export const getUncheckedSafeSDK = async (provider: Eip1193Provider): Promise<Safe> => {
+  const browserProvider = createWeb3(provider)
+  const signer = await browserProvider.getSigner()
+  const uncheckedJsonRpcSigner = new UncheckedJsonRpcSigner(signer.provider, await signer.getAddress())
   const sdk = getAndValidateSafeSDK()
 
   const ethAdapter = new EthersAdapter({
     ethers,
-    signerOrProvider: signer.connectUnchecked(),
+    signerOrProvider: uncheckedJsonRpcSigner,
   })
 
   return sdk.connect({ ethAdapter })
 }
 
-export const getSafeSDKWithSigner = async (onboard: OnboardAPI, chainId: SafeInfo['chainId']): Promise<Safe> => {
-  const signer = await getAssertedChainSigner(onboard, chainId)
+export const getSafeSDKWithSigner = async (provider: Eip1193Provider): Promise<Safe> => {
+  const browserProvider = createWeb3(provider)
+  const signer = await browserProvider.getSigner()
   const sdk = getAndValidateSafeSDK()
 
   const ethAdapter = new EthersAdapter({
@@ -121,17 +160,12 @@ export const getSafeSDKWithSigner = async (onboard: OnboardAPI, chainId: SafeInf
   return sdk.connect({ ethAdapter })
 }
 
-type SigningMethods = Parameters<Safe['signTransaction']>[1]
-
-export const getSupportedSigningMethods = (safeVersion: SafeInfo['version']): SigningMethods[] => {
-  const ETH_SIGN_TYPED_DATA: SigningMethods = 'eth_signTypedData'
-  const ETH_SIGN: SigningMethods = 'eth_sign'
-
+export const getSupportedSigningMethods = (safeVersion: SafeInfo['version']): SigningMethod[] => {
   if (!hasSafeFeature(SAFE_FEATURES.ETH_SIGN, safeVersion)) {
-    return [ETH_SIGN_TYPED_DATA]
+    return [SigningMethod.ETH_SIGN_TYPED_DATA]
   }
 
-  return [ETH_SIGN_TYPED_DATA, ETH_SIGN]
+  return [SigningMethod.ETH_SIGN_TYPED_DATA, SigningMethod.ETH_SIGN]
 }
 
 export const tryOffChainTxSigning = async (

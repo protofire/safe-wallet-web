@@ -8,6 +8,7 @@ import {
   isSettingsChangeTxInfo,
   isSpendingLimitMethod,
   isSupportedSpendingLimitAddress,
+  isSwapOrderTxInfo,
   isTransferTxInfo,
 } from '@/utils/transaction-guards'
 import { SpendingLimits } from '@/components/transactions/TxDetails/TxData/SpendingLimits'
@@ -18,13 +19,22 @@ import DecodedData from '@/components/transactions/TxDetails/TxData/DecodedData'
 import TransferTxInfo from '@/components/transactions/TxDetails/TxData/Transfer'
 import useChainId from '@/hooks/useChainId'
 import { MultiSendTxInfo } from '@/components/transactions/TxDetails/TxData/MultiSendTxInfo'
+import InteractWith from '@/features/swap/components/SwapTxInfo/interactWith'
 
-const TxData = ({ txDetails }: { txDetails: TransactionDetails }): ReactElement => {
+const TxData = ({
+  txDetails,
+  trusted,
+  imitation,
+}: {
+  txDetails: TransactionDetails
+  trusted: boolean
+  imitation: boolean
+}): ReactElement => {
   const chainId = useChainId()
   const txInfo = txDetails.txInfo
 
   if (isTransferTxInfo(txInfo)) {
-    return <TransferTxInfo txInfo={txInfo} txStatus={txDetails.txStatus} />
+    return <TransferTxInfo txInfo={txInfo} txStatus={txDetails.txStatus} trusted={trusted} imitation={imitation} />
   }
 
   if (isSettingsChangeTxInfo(txInfo)) {
@@ -42,6 +52,10 @@ const TxData = ({ txDetails }: { txDetails: TransactionDetails }): ReactElement 
   const method = txDetails.txData?.dataDecoded?.method as SpendingLimitMethods
   if (isCustomTxInfo(txInfo) && isSupportedSpendingLimitAddress(txInfo, chainId) && isSpendingLimitMethod(method)) {
     return <SpendingLimits txData={txDetails.txData} txInfo={txInfo} type={method} />
+  }
+
+  if (isSwapOrderTxInfo(txInfo)) {
+    return <InteractWith txData={txDetails.txData} />
   }
 
   return <DecodedData txData={txDetails.txData} txInfo={txInfo} />

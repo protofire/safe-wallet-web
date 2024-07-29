@@ -138,9 +138,10 @@ export const PushNotifications = (): ReactElement => {
                     <CheckWallet allowNonOwner>
                       {(isOk) => (
                         <FormControlLabel
+                          data-testid="notifications-switch"
                           control={<Switch checked={!!preferences} onChange={handleOnChange} />}
                           label={preferences ? 'On' : 'Off'}
-                          disabled={!isOk || isRegistering}
+                          disabled={!isOk || isRegistering || !safe.deployed}
                         />
                       )}
                     </CheckWallet>
@@ -251,7 +252,7 @@ export const PushNotifications = (): ReactElement => {
                       <Typography>Confirmation requests</Typography>
                       {!preferences[WebhookType.CONFIRMATION_REQUEST] && (
                         <Typography color="text.secondary" variant="body2">
-                          {isOwner ? 'Requires your signature' : 'Only owners'}
+                          {isOwner ? 'Requires your signature' : 'Only signers'}
                         </Typography>
                       )}
                     </>

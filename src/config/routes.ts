@@ -1,8 +1,9 @@
 export const AppRoutes = {
   '404': '/404',
-  _offline: '/_offline',
-  welcome: '/welcome',
+  '403': '/403',
+  wc: '/wc',
   terms: '/terms',
+  swap: '/swap',
   privacy: '/privacy',
   licenses: '/licenses',
   index: '/',
@@ -11,6 +12,7 @@ export const AppRoutes = {
   cookie: '/cookie',
   addressBook: '/address-book',
   addOwner: '/addOwner',
+  _offline: '/_offline',
   apps: {
     open: '/apps/open',
     index: '/apps',
@@ -26,8 +28,8 @@ export const AppRoutes = {
     create: '/new-safe/create',
   },
   settings: {
-    spendingLimits: '/settings/spending-limits',
     setup: '/settings/setup',
+    security: '/settings/security',
     notifications: '/settings/notifications',
     modules: '/settings/modules',
     index: '/settings',
@@ -44,9 +46,14 @@ export const AppRoutes = {
   },
   transactions: {
     tx: '/transactions/tx',
+    msg: '/transactions/msg',
     queue: '/transactions/queue',
     messages: '/transactions/messages',
     index: '/transactions',
     history: '/transactions/history',
+  },
+  welcome: {
+    index: '/welcome',
+    accounts: '/welcome/accounts',
   },
 }

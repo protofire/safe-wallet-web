@@ -1,54 +1,70 @@
 import * as constants from '../../support/constants'
 import * as main from '../../e2e/pages/main.page'
 import * as createwallet from '../pages/create_wallet.pages'
+import * as owner from '../pages/owners.pages'
+import * as wallet from '../../support/utils/wallet.js'
 
-const safeName = 'Test safe name'
-const ownerName = 'Test Owner Name'
-const ownerName2 = 'Test Owner Name 2'
+const walletCredentials = JSON.parse(Cypress.env('CYPRESS_WALLET_CREDENTIALS'))
+const signer = walletCredentials.OWNER_4_PRIVATE_KEY
 
-describe('Create Safe form', () => {
-  it('should navigate to the form', () => {
+describe('[SMOKE] Safe creation tests', () => {
+  beforeEach(() => {
+    cy.visit(constants.welcomeUrl + '?chain=sep')
     cy.clearLocalStorage()
-    cy.visit(constants.welcomeUrl)
     main.acceptCookies()
-    main.verifyGoerliWalletHeader()
-    createwallet.clickOnCreateNewAccuntBtn()
+  })
+  it('[SMOKE] Verify a Wallet can be connected', () => {
+    wallet.connectSigner(signer)
+    owner.waitForConnectionStatus()
+    createwallet.clickOnContinueWithWalletBtn()
+    createwallet.clickOnCreateNewSafeBtn()
+    owner.clickOnWalletExpandMoreIcon()
+    owner.clickOnDisconnectBtn()
+    wallet.connectSigner(signer)
+    owner.waitForConnectionStatus()
   })
 
-  it('should allow setting a name', () => {
-    createwallet.typeWalletName(safeName)
+  it('[SMOKE] Verify that a new Wallet has default name related to the selected network', () => {
+    wallet.connectSigner(signer)
+    owner.waitForConnectionStatus()
+    createwallet.clickOnContinueWithWalletBtn()
+    createwallet.clickOnCreateNewSafeBtn()
+    createwallet.verifyDefaultWalletName(createwallet.defaultSepoliaPlaceholder)
   })
 
-  it('should allow changing the network', () => {
-    createwallet.selectNetwork(constants.networks.ethereum)
-    createwallet.selectNetwork(constants.networks.goerli, true)
+  it('[SMOKE] Verify Add and Remove Owner Row works as expected', () => {
+    wallet.connectSigner(signer)
+    owner.waitForConnectionStatus()
+    createwallet.clickOnContinueWithWalletBtn()
+    createwallet.clickOnCreateNewSafeBtn()
     createwallet.clickOnNextBtn()
-  })
-
-  it('should display a default owner and threshold', () => {
-    createwallet.verifyOwnerAddress(constants.DEFAULT_OWNER_ADDRESS, 0)
-    createwallet.verifyThreshold(1)
-  })
-
-  it('should allow changing the owner name', () => {
-    createwallet.typeOwnerName(ownerName, 0)
-    cy.contains('button', 'Back').click()
-    cy.contains('button', 'Next').click()
-    createwallet.verifyOwnerName(ownerName, 0)
-  })
-
-  it('should add a new owner and update threshold', () => {
-    createwallet.addNewOwner(ownerName2, constants.EOA, 1)
-    createwallet.updateThreshold(2)
-  })
-
-  it('should remove an owner and update threshold', () => {
+    createwallet.clickOnAddNewOwnerBtn()
+    owner.verifyNumberOfOwners(2)
+    owner.verifyExistingOwnerAddress(1, '')
+    owner.verifyExistingOwnerName(1, '')
     createwallet.removeOwner(0)
-    createwallet.verifyThreshold(1)
-    createwallet.clickOnNextBtn()
+    main.verifyElementsCount(createwallet.removeOwnerBtn, 0)
+    createwallet.clickOnAddNewOwnerBtn()
+    owner.verifyNumberOfOwners(2)
   })
 
-  it('should display summary on review page', () => {
-    createwallet.verifySummaryData(safeName, constants.DEFAULT_OWNER_ADDRESS, 1, 1)
+  it('[SMOKE] Verify Threshold Setup', () => {
+    wallet.connectSigner(signer)
+    owner.waitForConnectionStatus()
+    createwallet.clickOnContinueWithWalletBtn()
+    createwallet.clickOnCreateNewSafeBtn()
+    createwallet.clickOnNextBtn()
+    createwallet.clickOnAddNewOwnerBtn()
+    createwallet.clickOnAddNewOwnerBtn()
+    owner.verifyNumberOfOwners(3)
+    createwallet.clickOnAddNewOwnerBtn()
+    owner.verifyNumberOfOwners(4)
+    owner.verifyThresholdLimit(1, 4)
+    createwallet.updateThreshold(3)
+    createwallet.removeOwner(1)
+    owner.verifyThresholdLimit(1, 3)
+    createwallet.removeOwner(1)
+    owner.verifyThresholdLimit(1, 2)
+    createwallet.updateThreshold(1)
   })
 })

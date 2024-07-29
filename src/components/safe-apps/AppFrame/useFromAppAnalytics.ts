@@ -1,4 +1,4 @@
-import type { MutableRefObject } from 'react'
+import type { RefObject } from 'react'
 import { useCallback, useEffect } from 'react'
 
 import type { AnalyticsEvent } from '@/services/analytics'
@@ -11,11 +11,15 @@ const ALLOWED_DOMAINS: RegExp[] = [
   /^https:\/\/safe-apps\.dev\.5afe\.dev$/,
   /^https:\/\/apps\.gnosis-safe\.io$/,
   /^https:\/\/apps-portal\.safe\.global$/,
+  /^https:\/\/community\.safe\.global$/,
+  /^https:\/\/safe-dao-governance\.staging\.5afe\.dev$/,
+  /^https:\/\/safe-dao-governance\.dev\.5afe\.dev$/,
 ]
 
-const useAnalyticsFromSafeApp = (iframeRef: MutableRefObject<HTMLIFrameElement | null>): void => {
+const useAnalyticsFromSafeApp = (iframeRef: RefObject<HTMLIFrameElement | undefined>): void => {
   const isValidMessage = useCallback(
     (msg: MessageEvent<AnalyticsEvent>) => {
+      if (!msg.data) return false
       const isFromIframe = iframeRef.current?.contentWindow === msg.source
       const isCategoryAllowed = msg.data.category === SAFE_APPS_ANALYTICS_CATEGORY
       const isDomainAllowed = ALLOWED_DOMAINS.find((regExp) => regExp.test(msg.origin)) !== undefined

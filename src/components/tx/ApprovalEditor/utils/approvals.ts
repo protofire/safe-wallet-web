@@ -1,11 +1,13 @@
 import { ERC20__factory } from '@/types/contracts'
 import { UNLIMITED_APPROVAL_AMOUNT } from '@/utils/tokens'
 import type { BaseTransaction } from '@safe-global/safe-apps-sdk'
-import type { DecodedDataResponse, TokenInfo } from '@safe-global/safe-gateway-typescript-sdk'
-import { parseUnits, id } from 'ethers/lib/utils'
-import { EMPTY_DATA } from '@safe-global/safe-core-sdk/dist/src/utils/constants'
+import type { DecodedDataResponse } from '@safe-global/safe-gateway-typescript-sdk'
+import { parseUnits, id } from 'ethers'
+import { EMPTY_DATA } from '@safe-global/protocol-kit/dist/src/utils/constants'
+import { type ApprovalInfo } from '../hooks/useApprovalInfos'
 
 export const APPROVAL_SIGNATURE_HASH = id('approve(address,uint256)').slice(0, 10)
+export const INCREASE_ALLOWANCE_SIGNATURE_HASH = id('increaseAllowance(address,uint256)').slice(0, 10)
 
 const MULTISEND_METHOD = 'multiSend'
 
@@ -19,15 +21,7 @@ const UINT256_TYPE = 'uint256'
 const ERC20_INTERFACE = ERC20__factory.createInterface()
 
 export enum PSEUDO_APPROVAL_VALUES {
-  UNLIMITED = 'Unlimited (not recommended)',
-}
-
-export type ApprovalInfo = {
-  tokenInfo: (Omit<TokenInfo, 'logoUri' | 'name'> & { logoUri?: string }) | undefined
-  tokenAddress: string
-  spender: any
-  amount: any
-  amountFormatted: string
+  UNLIMITED = 'Unlimited amount',
 }
 
 const parseApprovalAmount = (amount: string, decimals: number) => {
@@ -87,26 +81,36 @@ export const extractTxs: (txs: BaseTransaction[] | (DecodedDataResponse & { to: 
 }
 
 export const updateApprovalTxs = (
-  approvals: string[],
+  approvalFormValues: string[],
   approvalInfos: ApprovalInfo[] | undefined,
   txs: BaseTransaction[],
 ) => {
-  let approvalID = 0
-  const updatedTxs = txs.map((tx) => {
-    if (tx.data.startsWith(APPROVAL_SIGNATURE_HASH)) {
-      const newApproval = approvals[approvalID]
-      const approvalInfo = approvalInfos?.[approvalID]
+  const updatedTxs = txs.map((tx, txIndex) => {
+    const approvalIndex = approvalInfos?.findIndex((approval) => approval.transactionIndex === txIndex)
+    if (approvalIndex === undefined) {
+      return tx
+    }
+    if (tx.data.startsWith(APPROVAL_SIGNATURE_HASH) || tx.data.startsWith(INCREASE_ALLOWANCE_SIGNATURE_HASH)) {
+      const newApproval = approvalFormValues[approvalIndex]
+      const approvalInfo = approvalInfos?.[approvalIndex]
       if (!approvalInfo || !approvalInfo.tokenInfo) {
         // Without decimals and spender we cannot create a new tx
         return tx
       }
-      approvalID++
       const decimals = approvalInfo.tokenInfo.decimals
       const newAmountWei = parseApprovalAmount(newApproval, decimals)
-      return {
-        to: approvalInfo.tokenAddress,
-        value: '0',
-        data: ERC20_INTERFACE.encodeFunctionData(APPROVE_METHOD, [approvalInfo.spender, newAmountWei]),
+      if (tx.data.startsWith(APPROVAL_SIGNATURE_HASH)) {
+        return {
+          to: approvalInfo.tokenAddress,
+          value: '0',
+          data: ERC20_INTERFACE.encodeFunctionData('approve', [approvalInfo.spender, newAmountWei]),
+        }
+      } else {
+        return {
+          to: approvalInfo.tokenAddress,
+          value: '0',
+          data: ERC20_INTERFACE.encodeFunctionData('increaseAllowance', [approvalInfo.spender, newAmountWei]),
+        }
       }
     }
     return tx

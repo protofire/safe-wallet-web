@@ -9,29 +9,30 @@ type CheckWalletProps = {
   children: (ok: boolean) => ReactElement
   allowSpendingLimit?: boolean
   allowNonOwner?: boolean
+  noTooltip?: boolean
 }
 
 enum Message {
   WalletNotConnected = 'Please connect your wallet',
-  NotSafeOwner = 'Your connected wallet is not an owner of this Safe Account',
-  OnlySpendingLimitBeneficiary = 'You can only create ERC-20 transactions within your spending limit',
+  NotSafeOwner = 'Your connected wallet is not a signer of this Safe Account',
 }
 
-const CheckWallet = ({ children, allowSpendingLimit, allowNonOwner }: CheckWalletProps): ReactElement => {
+const CheckWallet = ({ children, allowSpendingLimit, allowNonOwner, noTooltip }: CheckWalletProps): ReactElement => {
   const wallet = useWallet()
   const isSafeOwner = useIsSafeOwner()
   const isSpendingLimit = useIsOnlySpendingLimitBeneficiary()
   const connectWallet = useConnectWallet()
 
-  const message = !wallet
-    ? Message.WalletNotConnected
-    : !isSafeOwner && !isSpendingLimit && !allowNonOwner
-    ? Message.NotSafeOwner
-    : isSpendingLimit && !allowSpendingLimit && !allowNonOwner
-    ? Message.OnlySpendingLimitBeneficiary
-    : ''
+  const message =
+    wallet && (isSafeOwner || allowNonOwner || (isSpendingLimit && allowSpendingLimit))
+      ? ''
+      : !wallet
+      ? Message.WalletNotConnected
+      : Message.NotSafeOwner
 
   if (!message) return children(true)
+
+  if (noTooltip) return children(false)
 
   return (
     <Tooltip title={message}>

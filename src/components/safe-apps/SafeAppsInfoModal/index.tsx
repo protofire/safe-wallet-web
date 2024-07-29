@@ -4,12 +4,12 @@ import { Grid, LinearProgress } from '@mui/material'
 
 import type { BrowserPermission } from '@/hooks/safe-apps/permissions'
 import Slider from './Slider'
-import LegalDisclaimer from './LegalDisclaimer'
 import AllowedFeaturesList from './AllowedFeaturesList'
 import type { AllowedFeatures, AllowedFeatureSelection } from '../types'
 import { PermissionStatus } from '../types'
 import UnknownAppWarning from './UnknownAppWarning'
 import { getOrigin } from '../utils'
+import LegalDisclaimerContent from '@/components/common/LegalDisclaimerContent'
 
 type SafeAppsInfoModalProps = {
   onCancel: () => void
@@ -112,6 +112,7 @@ const SafeAppsInfoModal = ({
   return (
     <Box display="flex" alignItems="center" justifyContent="center" flexDirection="column" height="calc(100vh - 52px)">
       <Box
+        data-testid="app-info-modal"
         sx={({ palette }) => ({
           width: '450px',
           backgroundColor: palette.background.paper,
@@ -134,7 +135,7 @@ const SafeAppsInfoModal = ({
         />
         <Grid container justifyContent="center" alignItems="center" direction="column" textAlign="center" p={3}>
           <Slider onSlideChange={handleSlideChange}>
-            {!isConsentAccepted && <LegalDisclaimer />}
+            {!isConsentAccepted && <LegalDisclaimerContent />}
 
             {!isPermissionsReviewCompleted && (
               <AllowedFeaturesList

@@ -1,3 +1,4 @@
+import MockDate from 'mockdate'
 import {
   getIncomingTransfers,
   getMultisigTransactions,
@@ -18,6 +19,8 @@ import {
 import { renderHook } from '@/tests/test-utils'
 import type { NextRouter } from 'next/router'
 import { type TxFilterFormState } from '@/components/transactions/TxFilterForm'
+
+MockDate.set('2021-01-01T00:00:00.000Z')
 
 jest.mock('@safe-global/safe-gateway-typescript-sdk', () => ({
   getIncomingTransfers: jest.fn(() => Promise.resolve({ results: [] })),
@@ -380,9 +383,20 @@ describe('tx-history-filter', () => {
     })
 
     it('should get incoming transfers relevant to `type`', () => {
-      fetchFilteredTxHistory('4', '0x123', { type: 'Incoming' as TxFilterType, filter: { value: '123' } }, 'pageUrl1')
+      fetchFilteredTxHistory(
+        '4',
+        '0x123',
+        { type: 'Incoming' as TxFilterType, filter: { value: '123' } },
+        false,
+        'pageUrl1',
+      )
 
-      expect(getIncomingTransfers).toHaveBeenCalledWith('4', '0x123', { value: '123' }, 'pageUrl1')
+      expect(getIncomingTransfers).toHaveBeenCalledWith(
+        '4',
+        '0x123',
+        { value: '123', executed: undefined, timezone_offset: 3600000, trusted: false, imitation: false },
+        'pageUrl1',
+      )
 
       expect(getMultisigTransactions).not.toHaveBeenCalled()
       expect(getModuleTransactions).not.toHaveBeenCalled()
@@ -396,13 +410,20 @@ describe('tx-history-filter', () => {
           type: 'Outgoing' as TxFilterType,
           filter: { execution_date__gte: '1970-01-01T00:00:00.000Z', executed: 'true' },
         },
+        false,
         'pageUrl2',
       )
 
       expect(getMultisigTransactions).toHaveBeenCalledWith(
         '100',
         '0x456',
-        { execution_date__gte: '1970-01-01T00:00:00.000Z', executed: 'true' },
+        {
+          execution_date__gte: '1970-01-01T00:00:00.000Z',
+          executed: 'true',
+          timezone_offset: 3600000,
+          trusted: false,
+          imitation: false,
+        },
         'pageUrl2',
       )
 
@@ -415,10 +436,16 @@ describe('tx-history-filter', () => {
         '1',
         '0x789',
         { type: 'Module-based' as TxFilterType, filter: { to: '0x123' } },
+        false,
         'pageUrl3',
       )
 
-      expect(getModuleTransactions).toHaveBeenCalledWith('1', '0x789', { to: '0x123' }, 'pageUrl3')
+      expect(getModuleTransactions).toHaveBeenCalledWith(
+        '1',
+        '0x789',
+        { to: '0x123', executed: undefined, timezone_offset: 3600000, trusted: false, imitation: false },
+        'pageUrl3',
+      )
 
       expect(getIncomingTransfers).not.toHaveBeenCalled()
       expect(getMultisigTransactions).not.toHaveBeenCalled()
@@ -428,7 +455,11 @@ describe('tx-history-filter', () => {
       fetchFilteredTxHistory(
         '1',
         '0x789',
-        { type: 'Test' as TxFilterType, filter: { token_address: '0x123' } },
+        {
+          type: 'Test' as TxFilterType,
+          filter: { token_address: '0x123' },
+        },
+        false,
         'pageUrl3',
       )
 

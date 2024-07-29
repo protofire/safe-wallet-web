@@ -1,3 +1,6 @@
+import CounterfactualHint from '@/features/counterfactual/CounterfactualHint'
+import useAddressBook from '@/hooks/useAddressBook'
+import useWallet from '@/hooks/wallets/useWallet'
 import { Button, SvgIcon, MenuItem, Tooltip, Typography, Divider, Box, Grid, TextField } from '@mui/material'
 import { Controller, FormProvider, useFieldArray, useForm } from 'react-hook-form'
 import type { ReactElement } from 'react'
@@ -12,8 +15,6 @@ import { useSafeSetupHints } from '@/components/new-safe/create/steps/OwnerPolic
 import useSyncSafeCreationStep from '@/components/new-safe/create/useSyncSafeCreationStep'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import layoutCss from '@/components/new-safe/create/styles.module.css'
-import NetworkWarning from '@/components/new-safe/create/NetworkWarning'
-import useIsWrongChain from '@/hooks/useIsWrongChain'
 import { CREATE_SAFE_EVENTS, trackEvent } from '@/services/analytics'
 import OwnerRow from '@/components/new-safe/OwnerRow'
 
@@ -38,13 +39,19 @@ const OwnerPolicyStep = ({
 }: StepRenderProps<NewSafeFormData> & {
   setDynamicHint: (hints: CreateSafeInfoItem | undefined) => void
 }): ReactElement => {
-  const isWrongChain = useIsWrongChain()
+  const wallet = useWallet()
+  const addressBook = useAddressBook()
+  const defaultOwnerAddressBookName = wallet?.address ? addressBook[wallet.address] : undefined
+  const defaultOwner: NamedAddress = {
+    name: defaultOwnerAddressBookName || wallet?.ens || '',
+    address: wallet?.address || '',
+  }
   useSyncSafeCreationStep(setStep)
 
   const formMethods = useForm<OwnerPolicyStepForm>({
     mode: 'onChange',
     defaultValues: {
-      [OwnerPolicyStepFields.owners]: data.owners,
+      [OwnerPolicyStepFields.owners]: data.owners.length > 0 ? data.owners : [defaultOwner],
       [OwnerPolicyStepFields.threshold]: data.threshold,
     },
   })
@@ -66,7 +73,7 @@ const OwnerPolicyStep = ({
     trigger(OwnerPolicyStepFields.owners)
   }
 
-  const isDisabled = isWrongChain || !formState.isValid
+  const isDisabled = !formState.isValid
 
   useSafeSetupHints(threshold, ownerFields.length, setDynamicHint)
 
@@ -90,7 +97,7 @@ const OwnerPolicyStep = ({
   })
 
   return (
-    <form onSubmit={onFormSubmit} id={OWNER_POLICY_STEP_FORM_ID}>
+    <form data-testid="owner-policy-step-form" onSubmit={onFormSubmit} id={OWNER_POLICY_STEP_FORM_ID}>
       <FormProvider {...formMethods}>
         <Box className={layoutCss.row}>
           {ownerFields.map((field, i) => (
@@ -103,28 +110,14 @@ const OwnerPolicyStep = ({
             />
           ))}
           <Button
+            data-testid="add-owner-btn"
             variant="text"
             onClick={() => appendOwner({ name: '', address: '' }, { shouldFocus: true })}
             startIcon={<SvgIcon component={AddIcon} inheritViewBox fontSize="small" />}
             size="large"
           >
-            Add new owner
+            Add new signer
           </Button>
-          <Box p={2} mt={3} sx={{ backgroundColor: 'background.main', borderRadius: '8px' }}>
-            <Typography variant="subtitle1" fontWeight={700} display="inline-flex" alignItems="center" gap={1}>
-              {'Safe{Wallet}'} mobile owner key (optional){' '}
-              <Tooltip
-                title="The Safe{Wallet} mobile app allows for the generation of owner keys that you can add to this or an existing Safe Account."
-                arrow
-                placement="top"
-              >
-                <span style={{ display: 'flex' }}>
-                  <SvgIcon component={InfoIcon} inheritViewBox color="border" fontSize="small" />
-                </span>
-              </Tooltip>
-            </Typography>
-            <Typography variant="body2">Use your mobile phone as an additional owner key</Typography>
-          </Box>
         </Box>
 
         <Divider />
@@ -132,7 +125,7 @@ const OwnerPolicyStep = ({
           <Typography variant="h4" fontWeight={700} display="inline-flex" alignItems="center" gap={1}>
             Threshold
             <Tooltip
-              title="The threshold of a Safe Account specifies how many owners need to confirm a Safe Account transaction before it can be executed."
+              title="The threshold of a Safe Account specifies how many signers need to confirm a Safe Account transaction before it can be executed."
               arrow
               placement="top"
             >
@@ -161,19 +154,25 @@ const OwnerPolicyStep = ({
               />
             </Grid>
             <Grid item>
-              <Typography>out of {ownerFields.length} owner(s)</Typography>
+              <Typography>out of {ownerFields.length} signer(s)</Typography>
             </Grid>
           </Grid>
 
-          {isWrongChain && <NetworkWarning />}
+          {ownerFields.length > 1 && <CounterfactualHint />}
         </Box>
         <Divider />
         <Box className={layoutCss.row}>
           <Box display="flex" flexDirection="row" justifyContent="space-between" gap={3}>
-            <Button variant="outlined" size="small" onClick={handleBack} startIcon={<ArrowBackIcon fontSize="small" />}>
+            <Button
+              data-testid="back-btn"
+              variant="outlined"
+              size="small"
+              onClick={handleBack}
+              startIcon={<ArrowBackIcon fontSize="small" />}
+            >
               Back
             </Button>
-            <Button type="submit" variant="contained" size="stretched" disabled={isDisabled}>
+            <Button data-testid="next-btn" type="submit" variant="contained" size="stretched" disabled={isDisabled}>
               Next
             </Button>
           </Box>

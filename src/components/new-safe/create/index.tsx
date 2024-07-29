@@ -5,12 +5,10 @@ import useWallet from '@/hooks/wallets/useWallet'
 import OverviewWidget from '@/components/new-safe/create/OverviewWidget'
 import type { NamedAddress } from '@/components/new-safe/create/types'
 import type { TxStepperProps } from '@/components/new-safe/CardStepper/useCardStepper'
-import ConnectWalletStep from '@/components/new-safe/create/steps/ConnectWalletStep'
 import SetNameStep from '@/components/new-safe/create/steps/SetNameStep'
 import OwnerPolicyStep from '@/components/new-safe/create/steps/OwnerPolicyStep'
 import ReviewStep from '@/components/new-safe/create/steps/ReviewStep'
 import { CreateSafeStatus } from '@/components/new-safe/create/steps/StatusStep'
-import useAddressBook from '@/hooks/useAddressBook'
 import { CardStepper } from '@/components/new-safe/CardStepper'
 import { AppRoutes } from '@/config/routes'
 import { CREATE_SAFE_CATEGORY } from '@/services/analytics'
@@ -54,17 +52,17 @@ const staticHints: Record<
     steps: [
       {
         title: 'Flat hierarchy',
-        text: 'Every owner has the same rights within the Safe Account and can propose, sign and execute transactions that have the required confirmations.',
+        text: 'Every signer has the same rights within the Safe Account and can propose, sign and execute transactions that have the required confirmations.',
       },
       {
-        title: 'Managing Owners',
-        text: 'You can always change the number of owners and required confirmations in your Safe Account after creation.',
+        title: 'Managing Signers',
+        text: 'You can always change the number of signers and required confirmations in your Safe Account after creation.',
       },
       {
         title: 'Safe Account setup',
         text: (
           <>
-            Not sure how many owners and confirmations you need for your Safe Account?
+            Not sure how many signers and confirmations you need for your Safe Account?
             <br />
             <ExternalLink href={HelpCenterArticle.SAFE_SETUP} fontWeight="bold">
               Learn more about setting up your Safe Account.
@@ -99,25 +97,12 @@ const staticHints: Record<
 const CreateSafe = () => {
   const router = useRouter()
   const wallet = useWallet()
-  const addressBook = useAddressBook()
-  const defaultOwnerAddressBookName = wallet?.address ? addressBook[wallet.address] : undefined
-  const defaultOwner: NamedAddress = {
-    name: defaultOwnerAddressBookName || wallet?.ens || '',
-    address: wallet?.address || '',
-  }
 
   const [safeName, setSafeName] = useState('')
   const [dynamicHint, setDynamicHint] = useState<CreateSafeInfoItem>()
   const [activeStep, setActiveStep] = useState(0)
 
   const CreateSafeSteps: TxStepperProps<NewSafeFormData>['steps'] = [
-    {
-      title: 'Connect wallet',
-      subtitle: 'The connected wallet will pay the network fees for the Safe Account creation.',
-      render: (data, onSubmit, onBack, setStep) => (
-        <ConnectWalletStep data={data} onSubmit={onSubmit} onBack={onBack} setStep={setStep} />
-      ),
-    },
     {
       title: 'Select network and name of your Safe Account',
       subtitle: 'Select the network on which to create your Safe Account',
@@ -126,9 +111,9 @@ const CreateSafe = () => {
       ),
     },
     {
-      title: 'Owners and confirmations',
+      title: 'Signers and confirmations',
       subtitle:
-        'Set the owner wallets of your Safe Account and how many need to confirm to execute a valid transaction.',
+        'Set the signer wallets of your Safe Account and how many need to confirm to execute a valid transaction.',
       render: (data, onSubmit, onBack, setStep) => (
         <OwnerPolicyStep
           setDynamicHint={setDynamicHint}
@@ -150,13 +135,14 @@ const CreateSafe = () => {
     {
       title: '',
       subtitle: '',
-      render: (data, onSubmit, onBack, setStep, setProgressColor) => (
+      render: (data, onSubmit, onBack, setStep, setProgressColor, setStepData) => (
         <CreateSafeStatus
           data={data}
           onSubmit={onSubmit}
           onBack={onBack}
           setStep={setStep}
           setProgressColor={setProgressColor}
+          setStepData={setStepData}
         />
       ),
     },
@@ -164,15 +150,16 @@ const CreateSafe = () => {
 
   const staticHint = useMemo(() => staticHints[activeStep], [activeStep])
 
+  const initialStep = 0
   const initialData: NewSafeFormData = {
     name: '',
-    owners: [defaultOwner],
+    owners: [],
     threshold: 1,
     saltNonce: Date.now(),
   }
 
   const onClose = () => {
-    router.push(AppRoutes.welcome)
+    router.push(AppRoutes.welcome.index)
   }
 
   return (
@@ -186,6 +173,7 @@ const CreateSafe = () => {
         <Grid item xs={12} md={8} order={[1, null, 0]}>
           <CardStepper
             initialData={initialData}
+            initialStep={initialStep}
             onClose={onClose}
             steps={CreateSafeSteps}
             eventCategory={CREATE_SAFE_CATEGORY}
@@ -195,7 +183,7 @@ const CreateSafe = () => {
 
         <Grid item xs={12} md={4} mb={[3, null, 0]} order={[0, null, 1]}>
           <Grid container spacing={3}>
-            {activeStep < 3 && <OverviewWidget safeName={safeName} />}
+            {activeStep < 2 && <OverviewWidget safeName={safeName} />}
             {wallet?.address && <CreateSafeInfos staticHint={staticHint} dynamicHint={dynamicHint} />}
           </Grid>
         </Grid>

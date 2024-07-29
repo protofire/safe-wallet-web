@@ -1,15 +1,16 @@
 import { type ReactElement } from 'react'
 import type {
-  Transfer,
-  Custom,
   Creation,
-  TransactionInfo,
+  Custom,
   MultiSend,
   SettingsChange,
+  TransactionInfo,
+  Transfer,
 } from '@safe-global/safe-gateway-typescript-sdk'
 import { SettingsInfoType } from '@safe-global/safe-gateway-typescript-sdk'
 import TokenAmount from '@/components/common/TokenAmount'
 import {
+  isOrderTxInfo,
   isCreationTxInfo,
   isCustomTxInfo,
   isERC20Transfer,
@@ -21,15 +22,18 @@ import {
 } from '@/utils/transaction-guards'
 import { ellipsis, shortenAddress } from '@/utils/formatters'
 import { useCurrentChain } from '@/hooks/useChains'
+import { SwapTx } from '@/features/swap/components/SwapTxInfo/SwapTx'
 
 export const TransferTx = ({
   info,
   omitSign = false,
   withLogo = true,
+  preciseAmount = false,
 }: {
   info: Transfer
   omitSign?: boolean
   withLogo?: boolean
+  preciseAmount?: boolean
 }): ReactElement => {
   const chainConfig = useCurrentChain()
   const { nativeCurrency } = chainConfig || {}
@@ -44,19 +48,30 @@ export const TransferTx = ({
         decimals={nativeCurrency?.decimals}
         tokenSymbol={nativeCurrency?.symbol}
         logoUri={withLogo ? nativeCurrency?.logoUri : undefined}
+        preciseAmount={preciseAmount}
       />
     )
   }
 
   if (isERC20Transfer(transfer)) {
-    return <TokenAmount {...transfer} direction={direction} logoUri={withLogo ? transfer?.logoUri : undefined} />
+    return (
+      <TokenAmount
+        {...transfer}
+        direction={direction}
+        logoUri={withLogo ? transfer?.logoUri : undefined}
+        preciseAmount={preciseAmount}
+      />
+    )
   }
 
   if (isERC721Transfer(transfer)) {
     return (
       <TokenAmount
         {...transfer}
-        tokenSymbol={ellipsis(`${transfer.tokenSymbol} #${transfer.tokenId}`, withLogo ? 16 : 100)}
+        tokenSymbol={ellipsis(
+          `${transfer.tokenSymbol ? transfer.tokenSymbol : 'Unknown NFT'} #${transfer.tokenId}`,
+          withLogo ? 16 : 100,
+        )}
         value="1"
         direction={undefined}
         logoUri={withLogo ? transfer?.logoUri : undefined}
@@ -114,6 +129,10 @@ const TxInfo = ({ info, ...rest }: { info: TransactionInfo; omitSign?: boolean; 
 
   if (isCreationTxInfo(info)) {
     return <CreationTx info={info} />
+  }
+
+  if (isOrderTxInfo(info)) {
+    return <SwapTx info={info} />
   }
 
   return <></>

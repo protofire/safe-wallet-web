@@ -15,14 +15,17 @@ import { useBrowserPermissions } from '@/hooks/safe-apps/permissions'
 import useChainId from '@/hooks/useChainId'
 import { AppRoutes } from '@/config/routes'
 import { getOrigin } from '@/components/safe-apps/utils'
+import { useHasFeature } from '@/hooks/useChains'
+import { FEATURES } from '@/utils/chains'
 
 const SafeApps: NextPage = () => {
   const chainId = useChainId()
   const router = useRouter()
   const appUrl = useSafeAppUrl()
-  const { safeApp, isLoading } = useSafeAppFromManifest(appUrl || '', chainId)
-
-  const { remoteSafeApps, remoteSafeAppsLoading } = useSafeApps()
+  const { allSafeApps, remoteSafeAppsLoading } = useSafeApps()
+  const safeAppData = allSafeApps.find((app) => app.url === appUrl)
+  const { safeApp, isLoading } = useSafeAppFromManifest(appUrl || '', chainId, safeAppData)
+  const isSafeAppsEnabled = useHasFeature(FEATURES.SAFE_APPS)
 
   const { addPermissions, getPermissions, getAllowedFeaturesList } = useBrowserPermissions()
   const origin = getOrigin(appUrl)
@@ -35,7 +38,7 @@ const SafeApps: NextPage = () => {
     onComplete,
   } = useSafeAppsInfoModal({
     url: origin,
-    safeApp: remoteSafeApps.find((app) => app.url === appUrl),
+    safeApp: safeAppData,
     permissions: safeApp?.safeAppsPermissions || [],
     addPermissions,
     getPermissions,
@@ -50,7 +53,16 @@ const SafeApps: NextPage = () => {
   }, [router])
 
   // appUrl is required to be present
-  if (!appUrl || !router.isReady) return null
+  if (!isSafeAppsEnabled || !appUrl || !router.isReady) return null
+
+  // No `safe` query param, redirect to the share route
+  if (router.isReady && !router.query.safe) {
+    router.push({
+      pathname: AppRoutes.share.safeApp,
+      query: { appUrl },
+    })
+    return null
+  }
 
   if (isModalVisible) {
     return (

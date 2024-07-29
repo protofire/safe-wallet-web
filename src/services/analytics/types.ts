@@ -6,6 +6,14 @@ export enum EventType {
   CLICK = 'customClick',
   META = 'metadata',
   SAFE_APP = 'safeApp',
+  SAFE_CREATED = 'safe_created',
+  SAFE_ACTIVATED = 'safe_activated',
+  SAFE_OPENED = 'safe_opened',
+  WALLET_CONNECTED = 'wallet_connected',
+  TX_CREATED = 'tx_created',
+  TX_CONFIRMED = 'tx_confirmed',
+  TX_EXECUTED = 'tx_executed',
+  TX_EXECUTED_THROUGH_ROLE = 'tx_executed_through_role',
 }
 
 export type EventLabel = string | number | boolean | null
@@ -28,4 +36,9 @@ export enum DeviceType {
   DESKTOP = 'desktop',
   MOBILE = 'mobile',
   TABLET = 'tablet',
+}
+
+export enum AnalyticsUserProperties {
+  WALLET_LABEL = 'walletLabel',
+  WALLET_ADDRESS = 'walletAddress',
 }

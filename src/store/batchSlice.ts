@@ -20,21 +20,6 @@ export const batchSlice = createSlice({
   name: 'batch',
   initialState,
   reducers: {
-    // Set a batch (used for reordering)
-    setBatch: (
-      state,
-      action: PayloadAction<{
-        chainId: string
-        safeAddress: string
-        items: DraftBatchItem[]
-      }>,
-    ) => {
-      const { chainId, safeAddress, items } = action.payload
-      state[chainId] = state[chainId] || {}
-      // @ts-expect-error
-      state[chainId][safeAddress] = items
-    },
-
     // Add a tx to the batch
     addTx: (
       state,
@@ -47,9 +32,11 @@ export const batchSlice = createSlice({
       const { chainId, safeAddress, txDetails } = action.payload
       state[chainId] = state[chainId] || {}
       state[chainId][safeAddress] = state[chainId][safeAddress] || []
+      // @ts-expect-error
       state[chainId][safeAddress].push({
         id: Math.random().toString(36).slice(2),
         timestamp: Date.now(),
+        // @ts-expect-error
         txDetails,
       })
     },
@@ -66,12 +53,12 @@ export const batchSlice = createSlice({
       const { chainId, safeAddress, id } = action.payload
       state[chainId] = state[chainId] || {}
       state[chainId][safeAddress] = state[chainId][safeAddress] || []
-      state[chainId][safeAddress] = state[chainId][safeAddress].filter((item: DraftBatchItem) => item.id !== id)
+      state[chainId][safeAddress] = state[chainId][safeAddress].filter((item) => item.id !== id)
     },
   },
 })
 
-export const { setBatch, addTx, removeTx } = batchSlice.actions
+export const { addTx, removeTx } = batchSlice.actions
 
 const selectAllBatches = (state: RootState): BatchTxsState => {
   return state[batchSlice.name] || initialState

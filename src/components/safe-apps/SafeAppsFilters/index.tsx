@@ -118,7 +118,7 @@ const SafeAppsFilters = ({
             ) : (
               <MenuItem disabled sx={{ padding: '0 6px 2px 6px', height: CATEGORY_OPTION_HEIGHT }} disableGutters>
                 <ListItemText
-                  primary={'No categories defined'}
+                  primary="No categories defined"
                   primaryTypographyProps={{ fontSize: 14, paddingLeft: '5px' }}
                 />
               </MenuItem>
@@ -190,7 +190,7 @@ const categoryMenuProps = {
   },
 }
 
-const getCategoryOptions = (safeAppList: SafeAppData[]): safeAppCatogoryOptionType[] => {
+export const getCategoryOptions = (safeAppList: SafeAppData[]): safeAppCatogoryOptionType[] => {
   return getUniqueTags(safeAppList).map((category) => ({
     label: category,
     value: category,

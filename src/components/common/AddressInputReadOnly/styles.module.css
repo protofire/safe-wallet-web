@@ -1,24 +1,5 @@
-.wrapper :global .MuiInputBase-root:hover .MuiOutlinedInput-notchedOutline,
-.wrapper :global .MuiInputBase-root .MuiOutlinedInput-notchedOutline {
-  border-color: var(--color-text-secondary);
-  border-width: 1px;
-}
-
-.wrapper :global .MuiInputLabel-root {
-  color: var(--color-text-secondary);
-}
-
-.wrapper :global .MuiInputBase-root {
-  height: 66px;
-}
-
-.wrapper :global input[text] {
-  padding: 0;
-}
-
 .input {
-  width: 100%;
-  padding: 12px var(--space-2);
+  width: calc(100% - 40px);
 }
 
 .input :global .MuiInputBase-input {
@@ -35,6 +16,6 @@
   color: var(--color-text-primary);
 }
 
-.input fieldset {
-  border-color: var(--color-border-light) !important;
+.value {
+  width: 100%;
 }

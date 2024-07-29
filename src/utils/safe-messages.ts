@@ -1,8 +1,6 @@
-import { hashMessage } from 'ethers/lib/utils'
+import { getBytes, hashMessage, type TypedDataDomain, type JsonRpcSigner } from 'ethers'
 import { gte } from 'semver'
-import { adjustVInSignature } from '@safe-global/safe-core-sdk/dist/src/utils/signatures'
-import { ethers } from 'ethers'
-import type { providers, TypedDataDomain } from 'ethers'
+import { adjustVInSignature } from '@safe-global/protocol-kit/dist/src/utils/signatures'
 
 import { hashTypedData } from '@/utils/web3'
 import { isValidAddress } from './validation'
@@ -13,8 +11,8 @@ import {
   type SafeMessage,
   type EIP712TypedData,
   type ChainInfo,
-  FEATURES,
 } from '@safe-global/safe-gateway-typescript-sdk'
+import { FEATURES } from '@/utils/chains'
 
 import { hasFeature } from './chains'
 import { asError } from '@/services/exceptions/utils'
@@ -28,6 +26,18 @@ const EIP1271_FALLBACK_HANDLER_SUPPORTED_SAFE_VERSION = '1.3.0'
 const EIP1271_SUPPORTED_SAFE_VERSION = '1.0.0'
 
 const EIP1271_OFFCHAIN_SUPPORTED_SAFE_APPS_SDK_VERSION = '7.11.0'
+
+const isHash = (payload: string) => /^0x[a-f0-9]+$/i.test(payload)
+
+/*
+ * Typeguard for EIP712TypedData
+ *
+ */
+export const isEIP712TypedData = (obj: any): obj is EIP712TypedData => {
+  return typeof obj === 'object' && obj != null && 'domain' in obj && 'types' in obj && 'message' in obj
+}
+
+export const isBlindSigningPayload = (obj: EIP712TypedData | string): boolean => !isEIP712TypedData(obj) && isHash(obj)
 
 export const generateSafeMessageMessage = (message: SafeMessage['message']): string => {
   return typeof message === 'string' ? hashMessage(message) : hashTypedData(message)
@@ -52,7 +62,7 @@ export const generateSafeMessageTypedData = (
   return {
     domain: isHandledByFallbackHandler
       ? {
-          chainId: chainId,
+          chainId,
           verifyingContract: address.value,
         }
       : { verifyingContract: address.value },
@@ -73,7 +83,7 @@ export const generateSafeMessageHash = (safe: SafeInfo, message: SafeMessage['me
 export const isOffchainEIP1271Supported = (
   { version, fallbackHandler }: SafeInfo,
   chain: ChainInfo | undefined,
-  sdkVersion: string,
+  sdkVersion?: string,
 ): boolean => {
   if (!version) {
     return false
@@ -85,7 +95,7 @@ export const isOffchainEIP1271Supported = (
   }
 
   // If the Safe apps sdk does not support off-chain signing yet
-  if (!gte(sdkVersion, EIP1271_OFFCHAIN_SUPPORTED_SAFE_APPS_SDK_VERSION)) {
+  if (sdkVersion && !gte(sdkVersion, EIP1271_OFFCHAIN_SUPPORTED_SAFE_APPS_SDK_VERSION)) {
     return false
   }
 
@@ -101,7 +111,7 @@ export const isOffchainEIP1271Supported = (
 }
 
 export const tryOffChainMsgSigning = async (
-  signer: providers.JsonRpcSigner,
+  signer: JsonRpcSigner,
   safe: SafeInfo,
   message: SafeMessage['message'],
 ): Promise<string> => {
@@ -111,7 +121,7 @@ export const tryOffChainMsgSigning = async (
     try {
       if (signingMethod === 'eth_signTypedData') {
         const typedData = generateSafeMessageTypedData(safe, message)
-        const signature = await signer._signTypedData(
+        const signature = await signer.signTypedData(
           typedData.domain as TypedDataDomain,
           typedData.types,
           typedData.message,
@@ -125,7 +135,7 @@ export const tryOffChainMsgSigning = async (
         const signerAddress = await signer.getAddress()
 
         const messageHash = generateSafeMessageHash(safe, message)
-        const signature = await signer.signMessage(ethers.utils.arrayify(messageHash))
+        const signature = await signer.signMessage(getBytes(messageHash))
 
         return adjustVInSignature(signingMethod, signature, messageHash, signerAddress)
       }

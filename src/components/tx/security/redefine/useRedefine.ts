@@ -17,6 +17,7 @@ import { SecuritySeverity } from '@/services/security/modules/types'
 import CloseIcon from '@/public/images/common/close.svg'
 import InfoIcon from '@/public/images/notifications/info.svg'
 import CheckIcon from '@/public/images/common/check.svg'
+import type { EIP712TypedData } from '@safe-global/safe-gateway-typescript-sdk'
 
 export const REDEFINE_RETRY_TIMEOUT = 2_000
 const RedefineModuleInstance = new RedefineModule()
@@ -44,25 +45,25 @@ export const mapRedefineSeverity: Record<SecuritySeverity, SecurityWarningProps>
     action: ACTION_REJECT,
     color: 'error',
     icon: CloseIcon,
-    label: 'Critical issue',
+    label: 'critical risk',
   },
   [SecuritySeverity.HIGH]: {
     action: ACTION_REJECT,
     color: 'error',
     icon: CloseIcon,
-    label: 'High issue',
+    label: 'high risk',
   },
   [SecuritySeverity.MEDIUM]: {
     action: ACTION_REVIEW,
     color: 'warning',
     icon: InfoIcon,
-    label: 'Medium issue',
+    label: 'medium risk',
   },
   [SecuritySeverity.LOW]: {
     action: ACTION_REVIEW,
     color: 'warning',
     icon: InfoIcon,
-    label: 'Low issue',
+    label: 'small risk',
   },
   [SecuritySeverity.NONE]: {
     color: 'success',
@@ -72,29 +73,40 @@ export const mapRedefineSeverity: Record<SecuritySeverity, SecurityWarningProps>
 }
 
 export const useRedefine = (
-  safeTransaction: SafeTransaction | undefined,
+  data: SafeTransaction | EIP712TypedData | undefined,
 ): AsyncResult<SecurityResponse<RedefineModuleResponse>> => {
   const { safe, safeAddress } = useSafeInfo()
   const wallet = useWallet()
   const [retryCounter, setRetryCounter] = useState(0)
   const isFeatureEnabled = useHasFeature(FEATURES.RISK_MITIGATION)
 
+  // Memoized JSON data to avoid unnecessary requests
+  const jsonData = useMemo(() => {
+    if (!data) return ''
+    let adjustedData = data
+    if ('data' in data) {
+      // We need to set nonce to 0 to avoid repeated requests with an updated nonce
+      adjustedData = { ...data, data: { ...data.data, nonce: 0 } }
+    }
+    return JSON.stringify(adjustedData)
+  }, [data])
+
   const [redefinePayload, redefineErrors, redefineLoading] = useAsync<SecurityResponse<RedefineModuleResponse>>(
     () => {
-      if (!isFeatureEnabled || !safeTransaction || !wallet?.address) {
+      if (!isFeatureEnabled || !jsonData || !wallet?.address) {
         return
       }
 
       return RedefineModuleInstance.scanTransaction({
         chainId: Number(safe.chainId),
-        safeTransaction,
+        data: JSON.parse(jsonData),
         safeAddress,
         walletAddress: wallet.address,
         threshold: safe.threshold,
       })
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [safe.chainId, safe.threshold, safeAddress, safeTransaction, wallet?.address, retryCounter, isFeatureEnabled],
+    [safe.chainId, safe.threshold, safeAddress, jsonData, wallet?.address, retryCounter, isFeatureEnabled],
     false,
   )
 

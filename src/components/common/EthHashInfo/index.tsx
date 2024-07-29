@@ -1,13 +1,11 @@
+import { useChain } from '@/hooks/useChains'
 import { type ReactElement } from 'react'
-import useAddressBook from '@/hooks/useAddressBook'
+import useAllAddressBooks from '@/hooks/useAllAddressBooks'
 import useChainId from '@/hooks/useChainId'
 import { useAppSelector } from '@/store'
 import { selectSettings } from '@/store/settingsSlice'
-import { selectChainById } from '@/store/chainsSlice'
 import { getBlockExplorerLink } from '@/utils/chains'
 import SrcEthHashInfo, { type EthHashInfoProps } from './SrcEthHashInfo'
-import { selectAddedSafes } from '@/store/addedSafesSlice'
-import useSafeAddress from '@/hooks/useSafeAddress'
 
 const EthHashInfo = ({
   showName = true,
@@ -16,30 +14,22 @@ const EthHashInfo = ({
 }: EthHashInfoProps & { showName?: boolean }): ReactElement => {
   const settings = useAppSelector(selectSettings)
   const currentChainId = useChainId()
-  const safeAddress = useSafeAddress()
-  const addedSafes = useAppSelector((state) => selectAddedSafes(state, currentChainId)) || {}
-  const chain = useAppSelector((state) => selectChainById(state, props.chainId || currentChainId))
-  const addressBook = useAddressBook()
-  const link = chain ? getBlockExplorerLink(chain, props.address) : undefined
-  const name = showName ? addressBook[props.address] || props.name : undefined
-  const showEmoji =
-    settings.addressEmojis &&
-    props.showAvatar !== false &&
-    !props.customAvatar &&
-    avatarSize >= 20 &&
-    (safeAddress === props.address || props.address in addedSafes)
+  const chain = useChain(props.chainId || currentChainId)
+  const addressBooks = useAllAddressBooks()
+  const link = chain && props.hasExplorer ? getBlockExplorerLink(chain, props.address) : undefined
+  const addressBookName = chain ? addressBooks?.[chain.chainId]?.[props.address] : undefined
+  const name = showName ? addressBookName || props.name : undefined
 
   return (
     <SrcEthHashInfo
       prefix={chain?.shortName}
-      showPrefix={settings.shortName.show}
       copyPrefix={settings.shortName.copy}
       {...props}
       name={name}
+      isAddressBookName={!!addressBookName}
       customAvatar={props.customAvatar}
       ExplorerButtonProps={{ title: link?.title || '', href: link?.href || '' }}
       avatarSize={avatarSize}
-      showEmoji={showEmoji}
     >
       {props.children}
     </SrcEthHashInfo>

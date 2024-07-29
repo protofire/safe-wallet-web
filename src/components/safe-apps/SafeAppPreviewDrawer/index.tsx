@@ -82,15 +82,16 @@ const SafeAppPreviewDrawer = ({ isOpen, safeApp, isBookmarked, onClose, onBookma
           Available networks
         </Typography>
 
-        <Box sx={{ display: 'flex', gap: 1, mt: 2, flexWrap: 'wrap' }}>
+        <Box sx={{ display: 'flex', gap: 2, mt: 2, flexWrap: 'wrap' }}>
           {safeApp?.chainIds.map((chainId) => (
-            <ChainIndicator key={chainId} chainId={chainId} inline renderWhiteSpaceIfNoChain={false} />
+            <ChainIndicator key={chainId} chainId={chainId} inline showUnknown={false} />
           ))}
         </Box>
 
         {/* Open Safe App button */}
         <Link href={safeAppUrl} passHref legacyBehavior>
           <Button
+            data-testid="open-safe-app-btn"
             fullWidth
             variant="contained"
             color="primary"

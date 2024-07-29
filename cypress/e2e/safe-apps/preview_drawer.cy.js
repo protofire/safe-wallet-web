@@ -1,29 +1,34 @@
 import * as constants from '../../support/constants'
 import * as main from '../pages/main.page'
 import * as safeapps from '../pages/safeapps.pages'
+import { getSafes, CATEGORIES } from '../../support/safes/safesHandler.js'
 
-describe('The Safe Apps info modal', () => {
-  before(() => {
+let staticSafes = []
+
+describe('Preview drawer tests', () => {
+  before(async () => {
+    staticSafes = await getSafes(CATEGORIES.static)
+  })
+
+  beforeEach(() => {
     cy.clearLocalStorage()
-    cy.visit(`/${constants.TEST_SAFE_2}/apps`, { failOnStatusCode: false })
+    cy.visit(`${constants.appsUrl}?safe=${staticSafes.SEP_STATIC_SAFE_2}`, {
+      failOnStatusCode: false,
+    })
     main.acceptCookies()
   })
 
-  describe('when opening a Safe App from the app list', () => {
-    it('should show the preview drawer', () => {
-      safeapps.clickOnApp(safeapps.logoWalletConnect)
+  it('Verify the preview drawer is displayed when opening a Safe App from the app list', () => {
+    safeapps.clickOnApp(safeapps.transactionBuilderStr)
 
-      cy.findByRole('presentation').within(() => {
-        safeapps.verifyPreviewWindow(
-          safeapps.walletConnectHeadlinePreview,
-          safeapps.connecttextPreview,
-          safeapps.availableNetworksPreview,
-        )
-        safeapps.pinApp(safeapps.pinWalletConnectStr)
-        safeapps.pinApp(safeapps.pinWalletConnectStr, false)
-        safeapps.closePreviewWindow()
-      })
-      cy.findByRole('presentation').should('not.exist')
+    cy.findByRole('presentation').within(() => {
+      safeapps.verifyPreviewWindow(
+        safeapps.transactiobUilderHeadlinePreview,
+        safeapps.connecttextPreview,
+        safeapps.availableNetworksPreview,
+      )
+      safeapps.closePreviewWindow()
     })
+    cy.findByRole('presentation').should('not.exist')
   })
 })

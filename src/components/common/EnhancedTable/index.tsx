@@ -32,8 +32,9 @@ type EnhancedRow = {
 
 type EnhancedHeadCell = {
   id: string
-  label: string
+  label: ReactNode
   width?: string
+  align?: string
   sticky?: boolean
 }
 
@@ -75,7 +76,10 @@ function EnhancedTableHead(props: EnhancedTableHeadProps) {
             align="left"
             padding="normal"
             sortDirection={orderBy === headCell.id ? order : false}
-            sx={headCell.width ? { width: headCell.width } : undefined}
+            sx={{
+              width: headCell.width ? headCell.width : '',
+              textAlign: headCell.align ? headCell.align : '',
+            }}
             className={classNames({ sticky: headCell.sticky })}
           >
             {headCell.label && (
@@ -135,13 +139,14 @@ function EnhancedTable({ rows, headCells, mobileVariant }: EnhancedTableProps) {
 
   return (
     <Box sx={{ width: '100%' }}>
-      <TableContainer component={Paper} sx={{ width: '100%', mb: 2 }}>
+      <TableContainer data-testid="table-container" component={Paper} sx={{ width: '100%', mb: 2 }}>
         <Table aria-labelledby="tableTitle" className={mobileVariant ? css.mobileColumn : undefined}>
           <EnhancedTableHead headCells={headCells} order={order} orderBy={orderBy} onRequestSort={handleRequestSort} />
           <TableBody>
             {pagedRows.length > 0 ? (
               pagedRows.map((row, index) => (
                 <TableRow
+                  data-testid="table-row"
                   tabIndex={-1}
                   key={row.key ?? index}
                   selected={row.selected}

@@ -4,7 +4,7 @@ import { TOKEN_LISTS } from '@/store/settingsSlice'
 import { act, fireEvent, getByRole, getByTestId, render, waitFor } from '@/tests/test-utils'
 import { safeParseUnits } from '@/utils/formatters'
 import { TokenType } from '@safe-global/safe-gateway-typescript-sdk'
-import { hexZeroPad } from 'ethers/lib/utils'
+import { toBeHex } from 'ethers'
 import { useState } from 'react'
 import AssetsTable from '.'
 import { COLLAPSE_TIMEOUT_MS } from './useHideAssets'
@@ -45,7 +45,7 @@ describe('AssetsTable', () => {
 
   test('select and deselect hidden assets', async () => {
     const mockHiddenAssets = {
-      '5': [hexZeroPad('0x2', 20), hexZeroPad('0x3', 20)],
+      '5': [toBeHex('0x2', 20), toBeHex('0x3', 20)],
     }
     const mockBalances = {
       data: {
@@ -56,7 +56,7 @@ describe('AssetsTable', () => {
             fiatBalance: '100',
             fiatConversion: '1',
             tokenInfo: {
-              address: hexZeroPad('0x2', 20),
+              address: toBeHex('0x2', 20),
               decimals: 18,
               logoUri: '',
               name: 'DAI',
@@ -69,7 +69,7 @@ describe('AssetsTable', () => {
             fiatBalance: '200',
             fiatConversion: '1',
             tokenInfo: {
-              address: hexZeroPad('0x3', 20),
+              address: toBeHex('0x3', 20),
               decimals: 18,
               logoUri: '',
               name: 'SPAM',
@@ -91,7 +91,6 @@ describe('AssetsTable', () => {
           hiddenTokens: mockHiddenAssets,
           tokenList: TOKEN_LISTS.ALL,
           shortName: {
-            show: true,
             copy: true,
             qr: true,
           },
@@ -107,9 +106,9 @@ describe('AssetsTable', () => {
           },
           signing: {
             onChainSigning: false,
+            blindSigning: false,
           },
           transactionExecution: true,
-          addressEmojis: false,
         },
       },
     })
@@ -152,7 +151,7 @@ describe('AssetsTable', () => {
 
   test('Deselect all and save', async () => {
     const mockHiddenAssets = {
-      '5': [hexZeroPad('0x2', 20), hexZeroPad('0x3', 20), hexZeroPad('0xdead', 20)],
+      '5': [toBeHex('0x2', 20), toBeHex('0x3', 20), toBeHex('0xdead', 20)],
     }
     const mockBalances = {
       data: {
@@ -163,7 +162,7 @@ describe('AssetsTable', () => {
             fiatBalance: '100',
             fiatConversion: '1',
             tokenInfo: {
-              address: hexZeroPad('0x2', 20),
+              address: toBeHex('0x2', 20),
               decimals: 18,
               logoUri: '',
               name: 'DAI',
@@ -176,7 +175,7 @@ describe('AssetsTable', () => {
             fiatBalance: '200',
             fiatConversion: '1',
             tokenInfo: {
-              address: hexZeroPad('0x3', 20),
+              address: toBeHex('0x3', 20),
               decimals: 18,
               logoUri: '',
               name: 'SPAM',
@@ -198,7 +197,6 @@ describe('AssetsTable', () => {
           hiddenTokens: mockHiddenAssets,
           tokenList: TOKEN_LISTS.ALL,
           shortName: {
-            show: true,
             copy: true,
             qr: true,
           },
@@ -214,9 +212,9 @@ describe('AssetsTable', () => {
           },
           signing: {
             onChainSigning: false,
+            blindSigning: false,
           },
           transactionExecution: true,
-          addressEmojis: false,
         },
       },
     })
@@ -232,9 +230,9 @@ describe('AssetsTable', () => {
     })
 
     // Expect 3 hidden token addresses
-    expect(result.queryByText(hexZeroPad('0x2', 20))).not.toBeNull()
-    expect(result.queryByText(hexZeroPad('0x3', 20))).not.toBeNull()
-    expect(result.queryByText(hexZeroPad('0xdead', 20))).not.toBeNull()
+    expect(result.queryByText(toBeHex('0x2', 20))).not.toBeNull()
+    expect(result.queryByText(toBeHex('0x3', 20))).not.toBeNull()
+    expect(result.queryByText(toBeHex('0xdead', 20))).not.toBeNull()
 
     fireEvent.click(result.getByText('Deselect all'))
     fireEvent.click(result.getByText('Save'))
@@ -248,9 +246,9 @@ describe('AssetsTable', () => {
     })
 
     // Expect one hidden token, which was not part of the current balance
-    expect(result.queryByText(hexZeroPad('0x2', 20))).toBeNull()
-    expect(result.queryByText(hexZeroPad('0x3', 20))).toBeNull()
-    expect(result.queryByText(hexZeroPad('0xdead', 20))).not.toBeNull()
+    expect(result.queryByText(toBeHex('0x2', 20))).toBeNull()
+    expect(result.queryByText(toBeHex('0x3', 20))).toBeNull()
+    expect(result.queryByText(toBeHex('0xdead', 20))).not.toBeNull()
   })
 
   test('immediately hide visible assets', async () => {
@@ -266,7 +264,7 @@ describe('AssetsTable', () => {
             fiatBalance: '100',
             fiatConversion: '1',
             tokenInfo: {
-              address: hexZeroPad('0x2', 20),
+              address: toBeHex('0x2', 20),
               decimals: 18,
               logoUri: '',
               name: 'DAI',
@@ -279,7 +277,7 @@ describe('AssetsTable', () => {
             fiatBalance: '200',
             fiatConversion: '1',
             tokenInfo: {
-              address: hexZeroPad('0x3', 20),
+              address: toBeHex('0x3', 20),
               decimals: 18,
               logoUri: '',
               name: 'SPAM',
@@ -301,7 +299,6 @@ describe('AssetsTable', () => {
           hiddenTokens: mockHiddenAssets,
           tokenList: TOKEN_LISTS.ALL,
           shortName: {
-            show: true,
             copy: true,
             qr: true,
           },
@@ -317,9 +314,9 @@ describe('AssetsTable', () => {
           },
           signing: {
             onChainSigning: false,
+            blindSigning: false,
           },
           transactionExecution: true,
-          addressEmojis: false,
         },
       },
     })
@@ -366,7 +363,7 @@ describe('AssetsTable', () => {
             fiatBalance: '100',
             fiatConversion: '1',
             tokenInfo: {
-              address: hexZeroPad('0x2', 20),
+              address: toBeHex('0x2', 20),
               decimals: 18,
               logoUri: '',
               name: 'DAI',
@@ -379,7 +376,7 @@ describe('AssetsTable', () => {
             fiatBalance: '200',
             fiatConversion: '1',
             tokenInfo: {
-              address: hexZeroPad('0x3', 20),
+              address: toBeHex('0x3', 20),
               decimals: 18,
               logoUri: '',
               name: 'SPAM',
@@ -401,7 +398,6 @@ describe('AssetsTable', () => {
           hiddenTokens: mockHiddenAssets,
           tokenList: TOKEN_LISTS.ALL,
           shortName: {
-            show: true,
             copy: true,
             qr: true,
           },
@@ -417,9 +413,9 @@ describe('AssetsTable', () => {
           },
           signing: {
             onChainSigning: false,
+            blindSigning: false,
           },
           transactionExecution: true,
-          addressEmojis: false,
         },
       },
     })

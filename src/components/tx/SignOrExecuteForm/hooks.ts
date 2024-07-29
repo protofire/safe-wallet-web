@@ -1,6 +1,8 @@
+import { assertWalletChain } from '@/services/tx/tx-sender/sdk'
+import { assertTx, assertWallet, assertOnboard } from '@/utils/helpers'
 import { useMemo } from 'react'
 import { type TransactionOptions, type SafeTransaction } from '@safe-global/safe-core-sdk-types'
-import { sameString } from '@safe-global/safe-core-sdk/dist/src/utils'
+import { sameString } from '@safe-global/protocol-kit/dist/src/utils'
 import useSafeInfo from '@/hooks/useSafeInfo'
 import useWallet from '@/hooks/wallets/useWallet'
 import useOnboard from '@/hooks/wallets/useOnboard'
@@ -13,34 +15,21 @@ import {
   dispatchTxSigning,
 } from '@/services/tx/tx-sender'
 import { useHasPendingTxs } from '@/hooks/usePendingTxs'
-import type { ConnectedWallet } from '@/services/onboard'
-import type { OnboardAPI } from '@web3-onboard/core'
-import { getSafeTxGas, getRecommendedNonce } from '@/services/tx/tx-sender/recommendedNonce'
+import { getSafeTxGas, getNonces } from '@/services/tx/tx-sender/recommendedNonce'
 import useAsync from '@/hooks/useAsync'
 import { useUpdateBatch } from '@/hooks/useDraftBatch'
-import { type Transaction, type TransactionDetails } from '@safe-global/safe-gateway-typescript-sdk'
+import { type TransactionDetails } from '@safe-global/safe-gateway-typescript-sdk'
 
 type TxActions = {
   addToBatch: (safeTx?: SafeTransaction, origin?: string) => Promise<string>
-  signTx: (safeTx?: SafeTransaction, txId?: string, origin?: string, transaction?: Transaction) => Promise<string>
+  signTx: (safeTx?: SafeTransaction, txId?: string, origin?: string) => Promise<string>
   executeTx: (
     txOptions: TransactionOptions,
     safeTx?: SafeTransaction,
     txId?: string,
     origin?: string,
     isRelayed?: boolean,
-    transaction?: Transaction,
   ) => Promise<string>
-}
-
-function assertTx(safeTx: SafeTransaction | undefined): asserts safeTx {
-  if (!safeTx) throw new Error('Transaction not provided')
-}
-function assertWallet(wallet: ConnectedWallet | null): asserts wallet {
-  if (!wallet) throw new Error('Wallet not connected')
-}
-function assertOnboard(onboard: OnboardAPI | undefined): asserts onboard {
-  if (!onboard) throw new Error('Onboard not connected')
 }
 
 export const useTxActions = (): TxActions => {
@@ -76,48 +65,54 @@ export const useTxActions = (): TxActions => {
     const signRelayedTx = async (safeTx: SafeTransaction, txId?: string): Promise<SafeTransaction> => {
       assertTx(safeTx)
       assertWallet(wallet)
-      assertOnboard(onboard)
 
       // Smart contracts cannot sign transactions off-chain
-      if (await isSmartContractWallet(wallet)) {
+      if (await isSmartContractWallet(wallet.chainId, wallet.address)) {
         throw new Error('Cannot relay an unsigned transaction from a smart contract wallet')
       }
-      return await dispatchTxSigning(safeTx, version, onboard, chainId, txId)
+      return await dispatchTxSigning(safeTx, version, wallet.provider, txId)
     }
 
-    const signTx: TxActions['signTx'] = async (safeTx, txId, origin, transaction) => {
+    const signTx: TxActions['signTx'] = async (safeTx, txId, origin) => {
       assertTx(safeTx)
       assertWallet(wallet)
       assertOnboard(onboard)
 
-      const humanDescription = transaction?.transaction?.txInfo?.humanDescription
+      await assertWalletChain(onboard, chainId)
 
       // Smart contract wallets must sign via an on-chain tx
-      if (await isSmartContractWallet(wallet)) {
+      if (await isSmartContractWallet(wallet.chainId, wallet.address)) {
         // If the first signature is a smart contract wallet, we have to propose w/o signatures
         // Otherwise the backend won't pick up the tx
         // The signature will be added once the on-chain signature is indexed
         const id = txId || (await proposeTx(wallet.address, safeTx, txId, origin)).txId
-        await dispatchOnChainSigning(safeTx, id, onboard, chainId, humanDescription)
+        await dispatchOnChainSigning(safeTx, id, wallet.provider, chainId)
         return id
       }
 
       // Otherwise, sign off-chain
-      const signedTx = await dispatchTxSigning(safeTx, version, onboard, chainId, txId, humanDescription)
+      const signedTx = await dispatchTxSigning(safeTx, version, wallet.provider, txId)
       const tx = await proposeTx(wallet.address, signedTx, txId, origin)
       return tx.txId
     }
 
-    const executeTx: TxActions['executeTx'] = async (txOptions, safeTx, txId, origin, isRelayed, transaction) => {
+    const executeTx: TxActions['executeTx'] = async (txOptions, safeTx, txId, origin, isRelayed) => {
       assertTx(safeTx)
       assertWallet(wallet)
       assertOnboard(onboard)
 
+      await assertWalletChain(onboard, chainId)
+
       let tx: TransactionDetails | undefined
       // Relayed transactions must be fully signed, so request a final signature if needed
       if (isRelayed && safeTx.signatures.size < safe.threshold) {
-        safeTx = await signRelayedTx(safeTx)
-        tx = await proposeTx(wallet.address, safeTx, txId, origin)
+        if (txId) {
+          safeTx = await signRelayedTx(safeTx)
+          tx = await proposeTx(wallet.address, safeTx, txId, origin)
+        } else {
+          tx = await proposeTx(wallet.address, safeTx, txId, origin)
+          safeTx = await signRelayedTx(safeTx)
+        }
         txId = tx.txId
       }
 
@@ -127,20 +122,18 @@ export const useTxActions = (): TxActions => {
         txId = tx.txId
       }
 
-      const humanDescription = tx?.txInfo?.humanDescription || transaction?.transaction?.txInfo?.humanDescription
-
       // Relay or execute the tx via connected wallet
       if (isRelayed) {
-        await dispatchTxRelay(safeTx, safe, txId, txOptions.gasLimit, humanDescription)
+        await dispatchTxRelay(safeTx, safe, txId, txOptions.gasLimit)
       } else {
-        await dispatchTxExecution(safeTx, txOptions, txId, onboard, chainId, safeAddress, humanDescription)
+        await dispatchTxExecution(safeTx, txOptions, txId, wallet.provider, wallet.address, safeAddress)
       }
 
       return txId
     }
 
     return { addToBatch, signTx, executeTx }
-  }, [safe, onboard, wallet, addTxToBatch])
+  }, [safe, wallet, addTxToBatch, onboard])
 }
 
 export const useValidateNonce = (safeTx: SafeTransaction | undefined): boolean => {
@@ -167,20 +160,21 @@ export const useRecommendedNonce = (): number | undefined => {
   const [recommendedNonce] = useAsync(
     async () => {
       if (!safe.chainId || !safeAddress) return
+      if (!safe.deployed) return 0
 
-      const recommendedNonce = await getRecommendedNonce(safe.chainId, safeAddress)
+      const nonces = await getNonces(safe.chainId, safeAddress)
 
-      return recommendedNonce !== undefined ? Math.max(safe.nonce, recommendedNonce) : undefined
+      return nonces?.recommendedNonce
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [safeAddress, safe.chainId, safe.txQueuedTag], // update when tx queue changes
+    [safeAddress, safe.chainId, safe.txQueuedTag, safe.txHistoryTag], // update when tx queue or history changes
     false, // keep old recommended nonce while refreshing to avoid skeleton
   )
 
   return recommendedNonce
 }
 
-export const useSafeTxGas = (safeTx: SafeTransaction | undefined): number | undefined => {
+export const useSafeTxGas = (safeTx: SafeTransaction | undefined): string | undefined => {
   const { safeAddress, safe } = useSafeInfo()
 
   // Memoize only the necessary params so that the useAsync hook is not called every time safeTx changes

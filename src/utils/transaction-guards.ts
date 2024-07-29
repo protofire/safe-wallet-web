@@ -1,10 +1,12 @@
 import type {
   AddressEx,
+  BaselineConfirmationView,
   Cancellation,
   ConflictHeader,
   Creation,
   Custom,
   DateLabel,
+  DecodedDataResponse,
   DetailedExecutionInfo,
   Erc20Transfer,
   Erc721Transfer,
@@ -16,26 +18,36 @@ import type {
   MultisigExecutionDetails,
   MultisigExecutionInfo,
   NativeCoinTransfer,
+  Order,
+  OrderConfirmationView,
   SafeInfo,
   SettingsChange,
+  SwapOrder,
+  SwapOrderConfirmationView,
   Transaction,
   TransactionInfo,
   TransactionListItem,
   TransactionSummary,
   Transfer,
   TransferInfo,
+  TwapOrder,
+  TwapOrderConfirmationView,
 } from '@safe-global/safe-gateway-typescript-sdk'
 import {
+  ConfirmationViewTypes,
   ConflictType,
   DetailedExecutionInfoType,
   TransactionInfoType,
   TransactionListItemType,
   TransactionStatus,
   TransactionTokenType,
+  TransferDirection,
 } from '@safe-global/safe-gateway-typescript-sdk'
 import { getSpendingLimitModuleAddress } from '@/services/contracts/spendingLimitContracts'
 import { sameAddress } from '@/utils/addresses'
 import type { NamedAddress } from '@/components/new-safe/create/types'
+import type { RecoveryQueueItem } from '@/features/recovery/services/recovery-state'
+import { ethers } from 'ethers'
 
 export const isTxQueued = (value: TransactionStatus): boolean => {
   return [TransactionStatus.AWAITING_CONFIRMATIONS, TransactionStatus.AWAITING_EXECUTION].includes(value)
@@ -66,7 +78,17 @@ export const isModuleDetailedExecutionInfo = (value?: DetailedExecutionInfo): va
 
 // TransactionInfo type guards
 export const isTransferTxInfo = (value: TransactionInfo): value is Transfer => {
-  return value.type === TransactionInfoType.TRANSFER
+  return value.type === TransactionInfoType.TRANSFER || isSwapTransferOrderTxInfo(value)
+}
+
+/**
+ * A fulfillment transaction for swap, limit or twap order is always a SwapOrder
+ * It cannot be a TWAP order
+ *
+ * @param value
+ */
+export const isSwapTransferOrderTxInfo = (value: TransactionInfo): value is SwapOrder => {
+  return value.type === TransactionInfoType.SWAP_TRANSFER
 }
 
 export const isSettingsChangeTxInfo = (value: TransactionInfo): value is SettingsChange => {
@@ -85,12 +107,66 @@ export const isMultiSendTxInfo = (value: TransactionInfo): value is MultiSend =>
   )
 }
 
+export const isOrderTxInfo = (value: TransactionInfo): value is Order => {
+  return isSwapOrderTxInfo(value) || isTwapOrderTxInfo(value)
+}
+
+export const isSwapOrderTxInfo = (value: TransactionInfo): value is SwapOrder => {
+  return value.type === TransactionInfoType.SWAP_ORDER
+}
+
+export const isTwapOrderTxInfo = (value: TransactionInfo): value is TwapOrder => {
+  return value.type === TransactionInfoType.TWAP_ORDER
+}
+
+export const isConfirmationViewOrder = (
+  decodedData: DecodedDataResponse | BaselineConfirmationView | OrderConfirmationView | undefined,
+): decodedData is OrderConfirmationView => {
+  return isSwapConfirmationViewOrder(decodedData) || isTwapConfirmationViewOrder(decodedData)
+}
+
+export const isTwapConfirmationViewOrder = (
+  decodedData: DecodedDataResponse | BaselineConfirmationView | OrderConfirmationView | undefined,
+): decodedData is TwapOrderConfirmationView => {
+  if (decodedData && 'type' in decodedData) {
+    return decodedData.type === ConfirmationViewTypes.COW_SWAP_TWAP_ORDER
+  }
+
+  return false
+}
+
+export const isSwapConfirmationViewOrder = (
+  decodedData: DecodedDataResponse | BaselineConfirmationView | OrderConfirmationView | undefined,
+): decodedData is SwapOrderConfirmationView => {
+  if (decodedData && 'type' in decodedData) {
+    return decodedData.type === ConfirmationViewTypes.COW_SWAP_ORDER
+  }
+
+  return false
+}
+
+export const isCancelledSwapOrder = (value: TransactionInfo) => {
+  return isSwapOrderTxInfo(value) && value.status === 'cancelled'
+}
+
+export const isOpenSwapOrder = (value: TransactionInfo) => {
+  return isSwapOrderTxInfo(value) && value.status === 'open'
+}
+
 export const isCancellationTxInfo = (value: TransactionInfo): value is Cancellation => {
   return isCustomTxInfo(value) && value.isCancellation
 }
 
 export const isCreationTxInfo = (value: TransactionInfo): value is Creation => {
   return value.type === TransactionInfoType.CREATION
+}
+
+export const isOutgoingTransfer = (txInfo: TransactionInfo): boolean => {
+  return isTransferTxInfo(txInfo) && txInfo.direction.toUpperCase() === TransferDirection.OUTGOING
+}
+
+export const isIncomingTransfer = (txInfo: TransactionInfo): boolean => {
+  return isTransferTxInfo(txInfo) && txInfo.direction.toUpperCase() === TransferDirection.INCOMING
 }
 
 // TransactionListItem type guards
@@ -108,6 +184,11 @@ export const isDateLabel = (value: TransactionListItem): value is DateLabel => {
 
 export const isTransactionListItem = (value: TransactionListItem): value is Transaction => {
   return value.type === TransactionListItemType.TRANSACTION
+}
+
+export function isRecoveryQueueItem(value: TransactionListItem | RecoveryQueueItem): value is RecoveryQueueItem {
+  const EVENT_SIGNATURE = 'TransactionAdded(uint256,bytes32,address,uint256,bytes,uint8)'
+  return 'fragment' in value && ethers.id(EVENT_SIGNATURE) === value.fragment.topicHash
 }
 
 // Narrows `Transaction`

@@ -1,3 +1,5 @@
+import AddressInputReadOnly from '@/components/common/AddressInputReadOnly'
+import useAddressBook from '@/hooks/useAddressBook'
 import type { ReactElement } from 'react'
 import { useEffect, useCallback, useRef, useMemo } from 'react'
 import {
@@ -13,7 +15,6 @@ import { useFormContext, useWatch, type Validate, get } from 'react-hook-form'
 import { validatePrefixedAddress } from '@/utils/validation'
 import { useCurrentChain } from '@/hooks/useChains'
 import useNameResolver from './useNameResolver'
-import ScanQRButton from '../ScanQRModal/ScanQRButton'
 import { FEATURES, hasFeature } from '@/utils/chains'
 import { cleanInputValue, parsePrefixedAddress } from '@/utils/addresses'
 import useDebounce from '@/hooks/useDebounce'
@@ -57,6 +58,8 @@ const AddressInput = ({
   const watchedValue = useWatch({ name, control })
   const currentShortName = currentChain?.shortName || ''
 
+  const addressBook = useAddressBook()
+
   // Fetch an ENS resolution for the current address
   const isDomainLookupEnabled = !!currentChain && hasFeature(currentChain, FEATURES.DOMAIN_LOOKUP)
   const { address, resolverError, resolving } = useNameResolver(isDomainLookupEnabled ? watchedValue : '')
@@ -97,8 +100,6 @@ const AddressInput = ({
             </IconButton>
           )}
 
-          <ScanQRButton onScan={setAddressValue} />
-
           {onOpenListClick && (
             <IconButton
               onClick={onOpenListClick}
@@ -120,15 +121,19 @@ const AddressInput = ({
         className={inputCss.input}
         autoComplete="off"
         autoFocus={props.focused}
-        label={<>{error?.message || props.label}</>}
+        label={<>{error?.message || props.label || `Recipient address${isDomainLookupEnabled ? ' or ENS' : ''}`}</>}
         error={!!error}
         fullWidth
+        onClick={addressBook[watchedValue] ? () => setValue(name, '') : undefined}
         spellCheck={false}
         InputProps={{
           ...(props.InputProps || {}),
+          className: addressBook[watchedValue] ? css.readOnly : undefined,
 
-          // Display the current short name in the adornment, unless the value contains the same prefix
-          startAdornment: (
+          startAdornment: addressBook[watchedValue] ? (
+            <AddressInputReadOnly address={watchedValue} />
+          ) : (
+            // Display the current short name in the adornment, unless the value contains the same prefix
             <InputAdornment position="end" sx={{ ml: 0, gap: 1 }}>
               {watchedValue && !fieldError ? (
                 <Identicon address={watchedValue} size={32} />
@@ -156,12 +161,17 @@ const AddressInput = ({
             const cleanValue = cleanInputValue(value)
             rawValueRef.current = cleanValue
             // This also checksums the address
-            return parsePrefixedAddress(cleanValue).address
+            if (validatePrefixed(cleanValue) === undefined) {
+              // if the prefix is correct we remove it from the value
+              return parsePrefixedAddress(cleanValue).address
+            } else {
+              // we keep invalid prefixes such that the validation error is persistet
+              return cleanValue
+            }
           },
 
           validate: async () => {
             const value = rawValueRef.current
-
             if (value) {
               return validatePrefixed(value) || (await validate?.(parsePrefixedAddress(value).address))
             }

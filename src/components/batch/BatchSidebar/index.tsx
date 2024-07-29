@@ -4,21 +4,20 @@ import { Button, Divider, Drawer, IconButton, SvgIcon, Typography } from '@mui/m
 import CloseIcon from '@mui/icons-material/Close'
 import { useDraftBatch, useUpdateBatch } from '@/hooks/useDraftBatch'
 import css from './styles.module.css'
-import NewTxMenu from '@/components/tx-flow/flows/NewTx'
+import { NewTxFlow } from '@/components/tx-flow/flows'
 import { TxModalContext } from '@/components/tx-flow'
-import ConfirmBatchFlow from '@/components/tx-flow/flows/ConfirmBatch'
+import { ConfirmBatchFlow } from '@/components/tx-flow/flows'
 import Track from '@/components/common/Track'
 import { BATCH_EVENTS } from '@/services/analytics'
-import { BatchReorder } from './BatchTxList'
 import CheckWallet from '@/components/common/CheckWallet'
-
 import PlusIcon from '@/public/images/common/plus.svg'
 import EmptyBatch from './EmptyBatch'
+import BatchTxList from './BatchTxList'
 
 const BatchSidebar = ({ isOpen, onToggle }: { isOpen: boolean; onToggle: (open: boolean) => void }) => {
   const { txFlow, setTxFlow } = useContext(TxModalContext)
   const batchTxs = useDraftBatch()
-  const [, deleteTx, onReorder] = useUpdateBatch()
+  const [, deleteTx] = useUpdateBatch()
 
   const closeSidebar = useCallback(() => {
     onToggle(false)
@@ -40,7 +39,7 @@ const BatchSidebar = ({ isOpen, onToggle }: { isOpen: boolean; onToggle: (open: 
   const onAddClick = useCallback(
     (e: SyntheticEvent) => {
       e.preventDefault()
-      setTxFlow(<NewTxMenu />, undefined, false)
+      setTxFlow(<NewTxFlow />, undefined, false)
     },
     [setTxFlow],
   )
@@ -61,7 +60,7 @@ const BatchSidebar = ({ isOpen, onToggle }: { isOpen: boolean; onToggle: (open: 
   }, [txFlow, closeSidebar])
 
   return (
-    <Drawer variant="temporary" anchor="right" open={isOpen} onClose={closeSidebar}>
+    <Drawer variant="temporary" anchor="right" open={isOpen} onClose={closeSidebar} transitionDuration={100}>
       <aside className={css.aside}>
         <Typography variant="h4" fontWeight={700} mb={1}>
           Batched transactions
@@ -72,7 +71,7 @@ const BatchSidebar = ({ isOpen, onToggle }: { isOpen: boolean; onToggle: (open: 
         {batchTxs.length ? (
           <>
             <div className={css.txs}>
-              <BatchReorder txItems={batchTxs} onDelete={deleteTx} onReorder={onReorder} />
+              <BatchTxList txItems={batchTxs} onDelete={deleteTx} />
             </div>
 
             <CheckWallet>

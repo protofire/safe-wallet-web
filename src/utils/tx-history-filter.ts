@@ -12,6 +12,7 @@ import { startOfDay, endOfDay } from 'date-fns'
 
 import type { TxFilterFormState } from '@/components/transactions/TxFilterForm'
 import { safeFormatUnits, safeParseUnits } from '@/utils/formatters'
+import { getTimezoneOffset } from '@/services/transactions'
 
 type IncomingTxFilter = NonNullable<operations['incoming_transfers']['parameters']['query']>
 type MultisigTxFilter = NonNullable<operations['multisig_transactions']['parameters']['query']>
@@ -118,24 +119,27 @@ export const fetchFilteredTxHistory = async (
   chainId: string,
   safeAddress: string,
   filterData: TxFilter,
+  onlyTrusted: boolean,
   pageUrl?: string,
 ): Promise<TransactionListPage> => {
   const fetchPage = () => {
+    const query = {
+      ...filterData.filter,
+      timezone_offset: getTimezoneOffset(),
+      trusted: onlyTrusted ?? false,
+      imitation: onlyTrusted ?? false,
+      executed: filterData.type === TxFilterType.MULTISIG ? 'true' : undefined,
+    }
+
     switch (filterData.type) {
       case TxFilterType.INCOMING: {
-        return getIncomingTransfers(chainId, safeAddress, filterData.filter, pageUrl)
+        return getIncomingTransfers(chainId, safeAddress, query, pageUrl)
       }
       case TxFilterType.MULTISIG: {
-        const filter = {
-          ...filterData.filter,
-          // We only filter historical transactions
-          executed: 'true',
-        }
-
-        return getMultisigTransactions(chainId, safeAddress, filter, pageUrl)
+        return getMultisigTransactions(chainId, safeAddress, query, pageUrl)
       }
       case TxFilterType.MODULE: {
-        return getModuleTransactions(chainId, safeAddress, filterData.filter, pageUrl)
+        return getModuleTransactions(chainId, safeAddress, query, pageUrl)
       }
       default: {
         return { results: [] }

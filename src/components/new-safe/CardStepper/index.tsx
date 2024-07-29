@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Box } from '@mui/system'
-import { lightPalette } from '@safe-global/safe-react-components'
+import lightPalette from '@/components/theme/lightPalette'
 import css from './styles.module.css'
 import { Card, LinearProgress, CardHeader, Avatar, Typography, CardContent } from '@mui/material'
 import type { TxStepperProps } from './useCardStepper'
@@ -8,7 +8,7 @@ import { useCardStepper } from './useCardStepper'
 
 export function CardStepper<StepperData>(props: TxStepperProps<StepperData>) {
   const [progressColor, setProgressColor] = useState(lightPalette.secondary.main)
-  const { activeStep, onSubmit, onBack, stepData, setStep } = useCardStepper<StepperData>(props)
+  const { activeStep, onSubmit, onBack, stepData, setStep, setStepData } = useCardStepper<StepperData>(props)
   const { steps } = props
   const currentStep = steps[activeStep]
   const progress = ((activeStep + 1) / steps.length) * 100
@@ -33,7 +33,7 @@ export function CardStepper<StepperData>(props: TxStepperProps<StepperData>) {
         />
       )}
       <CardContent className={css.content}>
-        {currentStep.render(stepData, onSubmit, onBack, setStep, setProgressColor)}
+        {currentStep.render(stepData, onSubmit, onBack, setStep, setProgressColor, setStepData)}
       </CardContent>
     </Card>
   )

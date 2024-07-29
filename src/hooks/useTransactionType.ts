@@ -1,15 +1,16 @@
+import { getOrderClass } from '@/features/swap/helpers/utils'
 import { useMemo } from 'react'
 import {
+  type AddressEx,
   SettingsInfoType,
   TransactionInfoType,
-  TransferDirection,
-  type AddressEx,
   type TransactionSummary,
 } from '@safe-global/safe-gateway-typescript-sdk'
 
-import { isCancellationTxInfo, isModuleExecutionInfo, isTxQueued } from '@/utils/transaction-guards'
+import { isCancellationTxInfo, isModuleExecutionInfo, isOutgoingTransfer, isTxQueued } from '@/utils/transaction-guards'
 import useAddressBook from './useAddressBook'
 import type { AddressBook } from '@/store/addressBookSlice'
+import { TWAP_ORDER_TITLE } from '@/features/swap/constants'
 
 const getTxTo = ({ txInfo }: Pick<TransactionSummary, 'txInfo'>): AddressEx | undefined => {
   switch (txInfo.type) {
@@ -44,8 +45,9 @@ export const getTransactionType = (tx: TransactionSummary, addressBook: AddressB
         text: 'Safe Account created',
       }
     }
+    case TransactionInfoType.SWAP_TRANSFER:
     case TransactionInfoType.TRANSFER: {
-      const isSendTx = tx.txInfo.direction === TransferDirection.OUTGOING
+      const isSendTx = isOutgoingTransfer(tx.txInfo)
 
       return {
         icon: isSendTx ? '/images/transactions/outgoing.svg' : '/images/transactions/incoming.svg',
@@ -60,6 +62,20 @@ export const getTransactionType = (tx: TransactionSummary, addressBook: AddressB
       return {
         icon: '/images/transactions/settings.svg',
         text: isDeleteGuard ? 'deleteGuard' : tx.txInfo.dataDecoded.method,
+      }
+    }
+    case TransactionInfoType.SWAP_ORDER: {
+      const orderClass = getOrderClass(tx.txInfo)
+
+      return {
+        icon: '/images/common/swap.svg',
+        text: orderClass === 'limit' ? 'Limit order' : 'Swap order',
+      }
+    }
+    case TransactionInfoType.TWAP_ORDER: {
+      return {
+        icon: '/images/common/swap.svg',
+        text: TWAP_ORDER_TITLE,
       }
     }
     case TransactionInfoType.CUSTOM: {

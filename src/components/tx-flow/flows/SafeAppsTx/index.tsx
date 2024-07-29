@@ -6,20 +6,26 @@ import { AppTitle } from '@/components/tx-flow/flows/SignMessage'
 
 export type SafeAppsTxParams = {
   appId?: string
-  app?: SafeAppData
+  app?: Partial<SafeAppData>
   requestId: RequestId
   txs: BaseTransaction[]
   params?: SendTransactionRequestParams
 }
 
-const SafeAppsTxFlow = ({ data }: { data: SafeAppsTxParams }) => {
+const SafeAppsTxFlow = ({
+  data,
+  onSubmit,
+}: {
+  data: SafeAppsTxParams
+  onSubmit?: (txId: string, safeTxHash: string) => void
+}) => {
   return (
     <TxLayout
       title="Confirm transaction"
-      subtitle={<AppTitle name={data.app?.name} logoUri={data.app?.iconUrl} />}
+      subtitle={<AppTitle name={data.app?.name} logoUri={data.app?.iconUrl} txs={data.txs} />}
       step={0}
     >
-      <ReviewSafeAppsTx safeAppsTx={data} />
+      <ReviewSafeAppsTx safeAppsTx={data} onSubmit={onSubmit} />
     </TxLayout>
   )
 }

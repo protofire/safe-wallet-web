@@ -9,7 +9,7 @@ import {
 } from '@/components/sidebar/SidebarList'
 import { BEAMER_SELECTOR, loadBeamer } from '@/services/beamer'
 import { useAppDispatch, useAppSelector } from '@/store'
-import { selectCookies, CookieType } from '@/store/cookiesSlice'
+import { selectCookies, CookieAndTermType } from '@/store/cookiesAndTermsSlice'
 import { openCookieBanner } from '@/store/popupSlice'
 import BeamerIcon from '@/public/images/sidebar/whats-new.svg'
 import HelpCenterIcon from '@/public/images/sidebar/help-center.svg'
@@ -25,7 +25,7 @@ const SidebarFooter = (): ReactElement => {
   const cookies = useAppSelector(selectCookies)
   const chain = useCurrentChain()
 
-  const hasBeamerConsent = useCallback(() => cookies[CookieType.UPDATES], [cookies])
+  const hasBeamerConsent = useCallback(() => cookies[CookieAndTermType.UPDATES], [cookies])
 
   useEffect(() => {
     // Initialise Beamer when consent was previously given
@@ -36,7 +36,7 @@ const SidebarFooter = (): ReactElement => {
 
   const handleBeamer = () => {
     if (!hasBeamerConsent()) {
-      dispatch(openCookieBanner({ warningKey: CookieType.UPDATES }))
+      dispatch(openCookieBanner({ warningKey: CookieAndTermType.UPDATES }))
     }
   }
 
@@ -54,7 +54,9 @@ const SidebarFooter = (): ReactElement => {
             <SidebarListItemIcon color="primary">
               <BeamerIcon />
             </SidebarListItemIcon>
-            <SidebarListItemText bold>What&apos;s new</SidebarListItemText>
+            <SidebarListItemText data-testid="list-item-whats-new" bold>
+              What&apos;s new
+            </SidebarListItemText>
           </SidebarListItemButton>
         </ListItem>
       </Track>
@@ -66,7 +68,9 @@ const SidebarFooter = (): ReactElement => {
               <SidebarListItemIcon color="primary">
                 <HelpCenterIcon />
               </SidebarListItemIcon>
-              <SidebarListItemText bold>Need help?</SidebarListItemText>
+              <SidebarListItemText data-testid="list-item-need-help" bold>
+                Need help?
+              </SidebarListItemText>
             </SidebarListItemButton>
           </a>
         </ListItem>

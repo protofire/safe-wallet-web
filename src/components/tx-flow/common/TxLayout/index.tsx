@@ -1,5 +1,7 @@
+import useSafeInfo from '@/hooks/useSafeInfo'
 import { type ComponentType, type ReactElement, type ReactNode, useContext, useEffect, useState } from 'react'
 import { Box, Container, Grid, Typography, Button, Paper, SvgIcon, IconButton, useMediaQuery } from '@mui/material'
+import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import { useTheme } from '@mui/material/styles'
 import type { TransactionSummary } from '@safe-global/safe-gateway-typescript-sdk'
 import classnames from 'classnames'
@@ -23,6 +25,7 @@ const TxLayoutHeader = ({
   icon: TxLayoutProps['icon']
   subtitle: TxLayoutProps['subtitle']
 }) => {
+  const { safe } = useSafeInfo()
   const { nonceNeeded } = useContext(SafeTxContext)
 
   if (hideNonce && !icon && !subtitle) return null
@@ -41,7 +44,7 @@ const TxLayoutHeader = ({
         </Typography>
       </Box>
 
-      {!hideNonce && nonceNeeded && <TxNonce />}
+      {!hideNonce && safe.deployed && nonceNeeded && <TxNonce />}
     </Box>
   )
 }
@@ -55,9 +58,11 @@ type TxLayoutProps = {
   txSummary?: TransactionSummary
   onBack?: () => void
   hideNonce?: boolean
+  hideProgress?: boolean
   isBatch?: boolean
   isReplacement?: boolean
   isMessage?: boolean
+  isRecovery?: boolean
 }
 
 const TxLayout = ({
@@ -69,6 +74,7 @@ const TxLayout = ({
   txSummary,
   onBack,
   hideNonce = false,
+  hideProgress = false,
   isBatch = false,
   isReplacement = false,
   isMessage = false,
@@ -77,6 +83,7 @@ const TxLayout = ({
 
   const theme = useTheme()
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('md'))
+  const isDesktop = useMediaQuery(theme.breakpoints.down('lg'))
 
   const steps = Array.isArray(children) ? children : [children]
   const progress = Math.round(((step + 1) / steps.length) * 100)
@@ -95,31 +102,41 @@ const TxLayout = ({
         <TxSecurityProvider>
           <>
             {/* Header status button */}
-            <IconButton
-              className={css.statusButton}
-              aria-label="Transaction status"
-              size="large"
-              onClick={toggleStatus}
-            >
-              <SafeLogo width={16} height={16} />
-            </IconButton>
+            {!isReplacement && (
+              <IconButton
+                className={css.statusButton}
+                aria-label="Transaction status"
+                size="large"
+                onClick={toggleStatus}
+              >
+                <SafeLogo width={16} height={16} />
+              </IconButton>
+            )}
 
             <Container className={css.container}>
               <Grid container gap={3} justifyContent="center">
                 {/* Main content */}
                 <Grid item xs={12} md={7}>
                   <div className={css.titleWrapper}>
-                    <Typography variant="h3" component="div" fontWeight="700" className={css.title}>
+                    <Typography
+                      data-testid="modal-title"
+                      variant="h3"
+                      component="div"
+                      fontWeight="700"
+                      className={css.title}
+                    >
                       {title}
                     </Typography>
 
                     <ChainIndicator inline />
                   </div>
 
-                  <Paper className={css.header}>
-                    <Box className={css.progressBar}>
-                      <ProgressBar value={progress} />
-                    </Box>
+                  <Paper data-testid="modal-header" className={css.header}>
+                    {!hideProgress && (
+                      <Box className={css.progressBar}>
+                        <ProgressBar value={progress} />
+                      </Box>
+                    )}
 
                     <TxLayoutHeader subtitle={subtitle} icon={icon} hideNonce={hideNonce} />
                   </Paper>
@@ -128,7 +145,13 @@ const TxLayout = ({
                     {steps[step]}
 
                     {onBack && step > 0 && (
-                      <Button variant="contained" onClick={onBack} className={css.backButton}>
+                      <Button
+                        data-testid="modal-back-btn"
+                        variant={isDesktop ? 'text' : 'outlined'}
+                        onClick={onBack}
+                        className={css.backButton}
+                        startIcon={<ArrowBackIcon fontSize="small" />}
+                      >
                         Back
                       </Button>
                     )}
@@ -136,22 +159,23 @@ const TxLayout = ({
                 </Grid>
 
                 {/* Sidebar */}
-                <Grid item xs={12} md={4} className={classnames(css.widget, { [css.active]: statusVisible })}>
-                  {statusVisible && (
-                    <TxStatusWidget
-                      step={step}
-                      txSummary={txSummary}
-                      handleClose={() => setStatusVisible(false)}
-                      isReplacement={isReplacement}
-                      isBatch={isBatch}
-                      isMessage={isMessage}
-                    />
-                  )}
+                {!isReplacement && (
+                  <Grid item xs={12} md={4} className={classnames(css.widget, { [css.active]: statusVisible })}>
+                    {statusVisible && (
+                      <TxStatusWidget
+                        step={step}
+                        txSummary={txSummary}
+                        handleClose={() => setStatusVisible(false)}
+                        isBatch={isBatch}
+                        isMessage={isMessage}
+                      />
+                    )}
 
-                  <Box className={css.sticky}>
-                    <SecurityWarnings />
-                  </Box>
-                </Grid>
+                    <Box className={css.sticky}>
+                      <SecurityWarnings />
+                    </Box>
+                  </Grid>
+                )}
               </Grid>
             </Container>
           </>

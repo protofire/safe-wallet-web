@@ -5,7 +5,7 @@ import Paper from '@mui/material/Paper'
 import Typography from '@mui/material/Typography'
 import IconButton from '@mui/material/IconButton'
 import MuiLink from '@mui/material/Link'
-import BellIcon from '@/public/images/notifications/bell.svg'
+import BellIcon from '@/public/images/common/notifications.svg'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import ExpandLessIcon from '@mui/icons-material/ExpandLess'
 import { useAppDispatch, useAppSelector } from '@/store'
@@ -25,6 +25,8 @@ import SettingsIcon from '@/public/images/sidebar/settings.svg'
 import css from './styles.module.css'
 import { trackEvent, OVERVIEW_EVENTS } from '@/services/analytics'
 import SvgIcon from '@mui/icons-material/ExpandLess'
+import { useHasFeature } from '@/hooks/useChains'
+import { FEATURES } from '@/utils/chains'
 
 const NOTIFICATION_CENTER_LIMIT = 4
 
@@ -33,7 +35,7 @@ const NotificationCenter = (): ReactElement => {
   const [showAll, setShowAll] = useState<boolean>(false)
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null)
   const open = Boolean(anchorEl)
-
+  const hasPushNotifications = useHasFeature(FEATURES.PUSH_NOTIFICATIONS)
   const dispatch = useAppDispatch()
 
   const notifications = useAppSelector(selectNotifications)
@@ -86,19 +88,24 @@ const NotificationCenter = (): ReactElement => {
     dispatch(deleteAllNotifications())
   }
 
+  const onSettingsClick = () => {
+    setTimeout(handleClose, 300)
+  }
+
   const ExpandIcon = showAll ? ExpandLessIcon : ExpandMoreIcon
 
   return (
     <>
-      <ButtonBase disableRipple className={css.bell} onClick={handleClick}>
+      <ButtonBase className={css.bell} onClick={handleClick}>
         <UnreadBadge
           invisible={!hasUnread}
+          count={unreadCount}
           anchorOrigin={{
             vertical: 'bottom',
             horizontal: 'right',
           }}
         >
-          <SvgIcon component={BellIcon} inheritViewBox fontSize="small" />
+          <SvgIcon component={BellIcon} inheritViewBox fontSize="medium" />
         </UnreadBadge>
       </ButtonBase>
 
@@ -114,7 +121,12 @@ const NotificationCenter = (): ReactElement => {
           vertical: 'top',
           horizontal: 'left',
         }}
-        sx={{ mt: 1 }}
+        sx={{
+          '& > .MuiPaper-root': {
+            top: 'var(--header-height) !important',
+          },
+        }}
+        transitionDuration={0}
       >
         <Paper className={css.popoverContainer}>
           <div className={css.popoverHeader}>
@@ -134,9 +146,11 @@ const NotificationCenter = (): ReactElement => {
               </MuiLink>
             )}
           </div>
+
           <div>
             <NotificationCenterList notifications={notificationsToShow} handleClose={handleClose} />
           </div>
+
           <div className={css.popoverFooter}>
             {canExpand && (
               <>
@@ -156,18 +170,21 @@ const NotificationCenter = (): ReactElement => {
                 </Typography>
               </>
             )}
-            <Link
-              href={{
-                pathname: AppRoutes.settings.notifications,
-                query: router.query,
-              }}
-              passHref
-              legacyBehavior
-            >
-              <MuiLink className={css.settingsLink} variant="body2" onClick={handleClose}>
-                <SvgIcon component={SettingsIcon} inheritViewBox fontSize="small" /> Settings
-              </MuiLink>
-            </Link>
+
+            {hasPushNotifications && (
+              <Link
+                href={{
+                  pathname: AppRoutes.settings.notifications,
+                  query: router.query,
+                }}
+                passHref
+                legacyBehavior
+              >
+                <MuiLink className={css.settingsLink} variant="body2" onClick={onSettingsClick}>
+                  <SvgIcon component={SettingsIcon} inheritViewBox fontSize="small" /> Push notifications settings
+                </MuiLink>
+              </Link>
+            )}
           </div>
         </Paper>
       </Popover>

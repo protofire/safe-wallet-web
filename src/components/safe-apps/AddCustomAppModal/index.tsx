@@ -1,5 +1,4 @@
 import { useCallback } from 'react'
-import { useRouter } from 'next/router'
 import type { SubmitHandler } from 'react-hook-form'
 import { useForm } from 'react-hook-form'
 import {
@@ -45,14 +44,13 @@ type CustomAppFormData = {
   safeApp: SafeAppData
 }
 
-const HELP_LINK = 'https://docs.safe.global/safe-core-aa-sdk/safe-apps/get-started'
+const HELP_LINK = 'https://docs.safe.global/apps-sdk-overview'
 const APP_ALREADY_IN_THE_LIST_ERROR = 'This Safe App is already in the list'
 const MANIFEST_ERROR = "The app doesn't support Safe App functionality"
 const INVALID_URL_ERROR = 'The url is invalid'
 
 export const AddCustomAppModal = ({ open, onClose, onSave, safeAppsList }: Props) => {
   const currentChain = useCurrentChain()
-  const router = useRouter()
 
   const {
     register,

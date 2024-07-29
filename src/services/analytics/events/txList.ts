@@ -40,15 +40,35 @@ export const TX_LIST_EVENTS = {
     action: 'Batch Execute',
     category: TX_LIST_CATEGORY,
   },
-  FETCH_DETAILS: {
-    action: 'Fetch transaction details',
+  EXPAND_TRANSACTION: {
+    action: 'Expand transaction item',
     category: TX_LIST_CATEGORY,
+  },
+  COPY_WARNING_SHOWN: {
+    action: 'Show copy address warning',
+    category: TX_LIST_CATEGORY,
+    event: EventType.META,
+  },
+  COPY_WARNING_PROCEED: {
+    action: 'Proceed and copy address',
+    category: TX_LIST_CATEGORY,
+    event: EventType.CLICK,
+  },
+  TOGGLE_UNTRUSTED: {
+    action: 'Toggle untrusted transactions',
+    category: TX_LIST_CATEGORY,
+    event: EventType.CLICK,
+    // label: 'hide' | 'show',
   },
 }
 
 export const MESSAGE_EVENTS = {
   SIGN: {
     action: 'Sign message',
+    category: TX_LIST_CATEGORY,
+  },
+  COPY_DEEPLINK: {
+    action: 'Copy message deeplink',
     category: TX_LIST_CATEGORY,
   },
 }

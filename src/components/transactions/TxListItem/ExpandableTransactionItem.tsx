@@ -9,15 +9,18 @@ import { useContext } from 'react'
 import { BatchExecuteHoverContext } from '@/components/transactions/BatchExecuteButton/BatchExecuteHoverProvider'
 import css from './styles.module.css'
 import classNames from 'classnames'
+import { trackEvent, TX_LIST_EVENTS } from '@/services/analytics'
 
 type ExpandableTransactionItemProps = {
-  isGrouped?: boolean
+  isConflictGroup?: boolean
+  isBulkGroup?: boolean
   item: Transaction
   txDetails?: TransactionDetails
 }
 
 export const ExpandableTransactionItem = ({
-  isGrouped = false,
+  isConflictGroup = false,
+  isBulkGroup = false,
   item,
   txDetails,
   testId,
@@ -35,14 +38,30 @@ export const ExpandableTransactionItem = ({
       }}
       elevation={0}
       defaultExpanded={!!txDetails}
-      className={classNames({ [css.batched]: isBatched })}
+      className={classNames(css.listItem, { [css.batched]: isBatched })}
       data-testid={testId}
+      onChange={(_, expanded) => {
+        if (expanded) {
+          trackEvent(TX_LIST_EVENTS.EXPAND_TRANSACTION)
+        }
+      }}
     >
-      <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{ justifyContent: 'flex-start', overflowX: 'auto' }}>
-        <TxSummary item={item} isGrouped={isGrouped} />
+      <AccordionSummary
+        expandIcon={<ExpandMoreIcon />}
+        sx={{
+          justifyContent: 'flex-start',
+          overflowX: 'auto',
+          ['.MuiAccordionSummary-content, .MuiAccordionSummary-content.Mui-expanded']: {
+            overflow: 'hidden',
+            margin: 0,
+            padding: '12px 0',
+          },
+        }}
+      >
+        <TxSummary item={item} isConflictGroup={isConflictGroup} isBulkGroup={isBulkGroup} />
       </AccordionSummary>
 
-      <AccordionDetails sx={{ padding: 0 }}>
+      <AccordionDetails data-testid="accordion-details" sx={{ padding: 0 }}>
         {isCreationTxInfo(item.transaction.txInfo) ? (
           <CreateTxInfo txSummary={item.transaction} />
         ) : (

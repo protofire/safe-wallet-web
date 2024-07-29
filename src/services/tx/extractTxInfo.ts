@@ -18,7 +18,7 @@ const extractTxInfo = (
   let signatures: Record<string, string> = {}
   if (isMultisigDetailedExecutionInfo(txDetails.detailedExecutionInfo)) {
     signatures = txDetails.detailedExecutionInfo.confirmations.reduce((result, item) => {
-      result[item.signer.value] = item.signature || ''
+      result[item.signer.value] = item.signature ?? ''
       return result
     }, signatures)
   }
@@ -26,16 +26,16 @@ const extractTxInfo = (
   const data = txDetails.txData?.hexData ?? EMPTY_DATA
 
   const baseGas = isMultisigDetailedExecutionInfo(txDetails.detailedExecutionInfo)
-    ? Number(txDetails.detailedExecutionInfo.baseGas)
-    : 0
+    ? txDetails.detailedExecutionInfo.baseGas
+    : '0'
 
   const gasPrice = isMultisigDetailedExecutionInfo(txDetails.detailedExecutionInfo)
-    ? Number(txDetails.detailedExecutionInfo.gasPrice)
-    : 0
+    ? txDetails.detailedExecutionInfo.gasPrice
+    : '0'
 
   const safeTxGas = isMultisigDetailedExecutionInfo(txDetails.detailedExecutionInfo)
-    ? Number(txDetails.detailedExecutionInfo.safeTxGas)
-    : 0
+    ? txDetails.detailedExecutionInfo.safeTxGas
+    : '0'
 
   const gasToken = isMultisigDetailedExecutionInfo(txDetails.detailedExecutionInfo)
     ? txDetails.detailedExecutionInfo.gasToken
@@ -57,12 +57,18 @@ const extractTxInfo = (
         } else {
           return txDetails.txData?.value ?? '0'
         }
+      case 'TwapOrder':
+        return txDetails.txData?.value ?? '0'
+      case 'SwapOrder':
+        return txDetails.txData?.value ?? '0'
       case 'Custom':
         return txDetails.txInfo.value
       case 'Creation':
       case 'SettingsChange':
-      default:
         return '0'
+      default: {
+        throw new Error(`Unknown transaction type: ${txDetails.txInfo.type}`)
+      }
     }
   })()
 
@@ -74,12 +80,21 @@ const extractTxInfo = (
         } else {
           return txDetails.txInfo.transferInfo.tokenAddress
         }
+      case 'SwapOrder':
+      case 'TwapOrder':
+        const orderTo = txDetails.txData?.to.value
+        if (!orderTo) {
+          throw new Error('Order tx data does not have a `to` field')
+        }
+        return orderTo
       case 'Custom':
         return txDetails.txInfo.to.value
       case 'Creation':
       case 'SettingsChange':
-      default:
         return safeAddress
+      default: {
+        throw new Error(`Unknown transaction type: ${txDetails.txInfo.type}`)
+      }
     }
   })()
 

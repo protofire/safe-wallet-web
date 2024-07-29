@@ -27,14 +27,6 @@ export const selectQueuedTransactionsByNonce = createSelector(
   },
 )
 
-export const selectQueuedTransactionById = createSelector(
-  selectQueuedTransactions,
-  (_: RootState, txId?: string) => txId,
-  (queuedTransactions, txId?: string) => {
-    return (queuedTransactions || []).find((item) => item.transaction.id === txId)
-  },
-)
-
 export const txQueueListener = (listenerMiddleware: typeof listenerMiddlewareInstance) => {
   listenerMiddleware.startListening({
     actionCreator: txQueueSlice.actions.set,
@@ -57,19 +49,14 @@ export const txQueueListener = (listenerMiddleware: typeof listenerMiddlewareIns
           continue
         }
 
-        const awaitingSigner = pendingTx.signerAddress
-        if (!awaitingSigner) {
-          continue
-        }
-
         // The transaction is waiting for a signature of awaitingSigner
         if (
           isMultisigExecutionInfo(result.transaction.executionInfo) &&
           !result.transaction.executionInfo.missingSigners?.some((address) =>
-            sameAddress(address.value, awaitingSigner),
+            sameAddress(address.value, pendingTx.signerAddress),
           )
         ) {
-          txDispatch(TxEvent.SIGNATURE_INDEXED, { txId: txId })
+          txDispatch(TxEvent.SIGNATURE_INDEXED, { txId })
         }
       }
     },

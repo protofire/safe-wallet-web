@@ -1,45 +1,75 @@
-import { didRevert } from '@/utils/ethers-utils'
+import { didRevert, type EthersError } from '@/utils/ethers-utils'
 
 import { txDispatch, TxEvent } from '@/services/tx/txEvents'
 
-import type { JsonRpcProvider } from '@ethersproject/providers'
 import { POLLING_INTERVAL } from '@/config/constants'
 import { Errors, logError } from '@/services/exceptions'
-import { SafeCreationStatus } from '@/components/new-safe/create/steps/StatusStep/useSafeCreation'
 import { asError } from '../exceptions/utils'
+import { type JsonRpcProvider, type TransactionReceipt } from 'ethers'
+import { SimpleTxWatcher } from '@/utils/SimpleTxWatcher'
+
+export function _getRemainingTimeout(defaultTimeout: number, submittedAt?: number) {
+  const timeoutInMs = defaultTimeout * 60_000
+  const timeSinceSubmission = submittedAt !== undefined ? Date.now() - submittedAt : 0
+
+  return Math.max(timeoutInMs - timeSinceSubmission, 1)
+}
 
 // Provider must be passed as an argument as it is undefined until initialised by `useInitWeb3`
-export const waitForTx = async (provider: JsonRpcProvider, txId: string, txHash: string) => {
-  const TIMEOUT_MINUTES = 6.5
-
-  try {
-    // Return receipt after 1 additional block was mined/validated or until timeout
-    // https://docs.ethers.io/v5/single-page/#/v5/api/providers/provider/-%23-Provider-waitForTransaction
-    const receipt = await provider.waitForTransaction(txHash, 1, TIMEOUT_MINUTES * 60_000)
-
-    if (!receipt) {
-      throw new Error(
-        `Transaction not processed in ${TIMEOUT_MINUTES} minutes. Be aware that it might still be processed.`,
-      )
-    }
-
-    if (didRevert(receipt)) {
-      txDispatch(TxEvent.REVERTED, {
-        txId,
-        error: new Error(`Transaction reverted by EVM.`),
+export const waitForTx = async (
+  provider: JsonRpcProvider,
+  txIds: string[],
+  txHash: string,
+  safeAddress: string,
+  walletAddress: string,
+  walletNonce: number,
+) => {
+  const processReceipt = (receipt: TransactionReceipt | null, txIds: string[]) => {
+    if (receipt === null) {
+      txIds.forEach((txId) => {
+        txDispatch(TxEvent.FAILED, {
+          txId,
+          error: new Error(`Transaction not found. It might have been replaced or cancelled in the connected wallet.`),
+        })
+      })
+    } else if (didRevert(receipt)) {
+      txIds.forEach((txId) => {
+        txDispatch(TxEvent.REVERTED, {
+          txId,
+          error: new Error('Transaction reverted by EVM.'),
+        })
+      })
+    } else {
+      txIds.forEach((txId) => {
+        txDispatch(TxEvent.PROCESSED, {
+          txId,
+          safeAddress,
+          txHash,
+        })
       })
     }
+  }
 
-    // Tx successfully mined/validated but we don't dispatch SUCCESS as this may be faster than our indexer
-  } catch (error) {
-    txDispatch(TxEvent.FAILED, {
-      txId,
-      error: asError(error),
+  const processError = (err: any, txIds: string[]) => {
+    const error = err as EthersError
+
+    txIds.forEach((txId) => {
+      txDispatch(TxEvent.FAILED, {
+        txId,
+        error: asError(error),
+      })
     })
+  }
+
+  try {
+    const receipt = await SimpleTxWatcher.getInstance().watchTxHash(txHash, walletAddress, walletNonce, provider)
+    processReceipt(receipt, txIds)
+  } catch (error) {
+    processError(error, txIds)
   }
 }
 
-enum TaskState {
+export enum TaskState {
   CheckPending = 'CheckPending',
   ExecPending = 'ExecPending',
   ExecSuccess = 'ExecSuccess',
@@ -65,7 +95,7 @@ type TransactionStatusResponse = {
 const TASK_STATUS_URL = 'https://relay.gelato.digital/tasks/status'
 const getTaskTrackingUrl = (taskId: string) => `${TASK_STATUS_URL}/${taskId}`
 
-const getRelayTxStatus = async (taskId: string): Promise<{ task: TransactionStatusResponse } | undefined> => {
+export const getRelayTxStatus = async (taskId: string): Promise<{ task: TransactionStatusResponse } | undefined> => {
   const url = getTaskTrackingUrl(taskId)
 
   let response
@@ -91,13 +121,7 @@ const getRelayTxStatus = async (taskId: string): Promise<{ task: TransactionStat
 
 const WAIT_FOR_RELAY_TIMEOUT = 3 * 60_000 // 3 minutes
 
-export const waitForRelayedTx = (
-  taskId: string,
-  txIds: string[],
-  safeAddress: string,
-  groupKey?: string,
-  humanDescription?: string,
-): void => {
+export const waitForRelayedTx = (taskId: string, txIds: string[], safeAddress: string, groupKey?: string): void => {
   let intervalId: NodeJS.Timeout
   let failAfterTimeoutId: NodeJS.Timeout
 
@@ -116,7 +140,6 @@ export const waitForRelayedTx = (
             txId,
             groupKey,
             safeAddress,
-            humanDescription,
           }),
         )
         break
@@ -126,7 +149,6 @@ export const waitForRelayedTx = (
             txId,
             error: new Error(`Relayed transaction reverted by EVM.`),
             groupKey,
-            humanDescription,
           }),
         )
         break
@@ -136,7 +158,6 @@ export const waitForRelayedTx = (
             txId,
             error: new Error(`Relayed transaction was blacklisted by relay provider.`),
             groupKey,
-            humanDescription,
           }),
         )
         break
@@ -146,7 +167,6 @@ export const waitForRelayedTx = (
             txId,
             error: new Error(`Relayed transaction was cancelled by relay provider.`),
             groupKey,
-            humanDescription,
           }),
         )
         break
@@ -156,7 +176,6 @@ export const waitForRelayedTx = (
             txId,
             error: new Error(`Relayed transaction was not found.`),
             groupKey,
-            humanDescription,
           }),
         )
         break
@@ -179,47 +198,8 @@ export const waitForRelayedTx = (
           } minutes. Be aware that it might still be relayed.`,
         ),
         groupKey,
-        humanDescription,
       }),
     )
-
-    clearInterval(intervalId)
-  }, WAIT_FOR_RELAY_TIMEOUT)
-}
-
-export const waitForCreateSafeTx = (taskId: string, setStatus: (value: SafeCreationStatus) => void): void => {
-  let intervalId: NodeJS.Timeout
-  let failAfterTimeoutId: NodeJS.Timeout
-
-  intervalId = setInterval(async () => {
-    const status = await getRelayTxStatus(taskId)
-
-    // 404
-    if (!status) {
-      return
-    }
-
-    switch (status.task.taskState) {
-      case TaskState.ExecSuccess:
-        setStatus(SafeCreationStatus.SUCCESS)
-        break
-      case TaskState.ExecReverted:
-      case TaskState.Blacklisted:
-      case TaskState.Cancelled:
-      case TaskState.NotFound:
-        setStatus(SafeCreationStatus.ERROR)
-        break
-      default:
-        // Don't clear interval as we're still waiting for the tx to be relayed
-        return
-    }
-
-    clearTimeout(failAfterTimeoutId)
-    clearInterval(intervalId)
-  }, POLLING_INTERVAL)
-
-  failAfterTimeoutId = setTimeout(() => {
-    setStatus(SafeCreationStatus.ERROR)
 
     clearInterval(intervalId)
   }, WAIT_FOR_RELAY_TIMEOUT)

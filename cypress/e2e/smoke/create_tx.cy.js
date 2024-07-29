@@ -1,46 +1,56 @@
 import * as constants from '../../support/constants'
 import * as main from '../../e2e/pages/main.page'
 import * as createtx from '../../e2e/pages/create_tx.pages'
+import { getSafes, CATEGORIES } from '../../support/safes/safesHandler.js'
+import * as wallet from '../../support/utils/wallet.js'
 
-const sendValue = 0.00002
-const currentNonce = 3
+let staticSafes = []
 
-describe('Queue a transaction on 1/N', () => {
-  before(() => {
-    cy.clearLocalStorage()
-    cy.visit(constants.homeUrl + constants.TEST_SAFE)
-    main.acceptCookies()
+const currentNonce = 5
+
+const walletCredentials = JSON.parse(Cypress.env('CYPRESS_WALLET_CREDENTIALS'))
+const signer = walletCredentials.OWNER_4_PRIVATE_KEY
+
+describe('[SMOKE] Create transactions tests', () => {
+  before(async () => {
+    staticSafes = await getSafes(CATEGORIES.static)
   })
 
-  it('should create a new send token transaction', () => {
+  beforeEach(() => {
+    cy.clearLocalStorage()
+    cy.visit(constants.BALANCE_URL + staticSafes.SEP_STATIC_SAFE_10)
+    main.acceptCookies()
+    wallet.connectSigner(signer)
     createtx.clickOnNewtransactionBtn()
     createtx.clickOnSendTokensBtn()
-    createtx.typeRecipientAddress(constants.EOA)
-    createtx.clickOnTokenselectorAndSelectGoerli()
+  })
+
+  it('[SMOKE] Verify MaxAmount button', () => {
     createtx.setMaxAmount()
-    createtx.verifyMaxAmount(constants.goerliToken, constants.tokenAbbreviation.gor)
-    createtx.setSendValue(sendValue)
-    createtx.clickOnNextBtn()
+    createtx.verifyMaxAmount(constants.tokenNames.sepoliaEther, constants.tokenAbbreviation.sep)
   })
 
-  it('should review, edit and submit the tx', () => {
-    createtx.verifySubmitBtnIsEnabled()
-    cy.wait(1000)
-    createtx.verifyNativeTokenTransfer()
-    createtx.changeNonce(currentNonce)
-    createtx.verifyConfirmTransactionData()
-    createtx.openExecutionParamsModal()
-    createtx.verifyAndSubmitExecutionParams()
-    createtx.clickOnNoLaterOption()
-    createtx.changeNonce(13)
-    createtx.clickOnSignTransactionBtn()
+  it('[SMOKE] Verify error messages for invalid address input', () => {
+    createtx.verifyRandomStringAddress('Lorem Ipsum')
+    createtx.verifyWrongChecksum(constants.WRONGLY_CHECKSUMMED_ADDRESS)
   })
 
-  it('should click on the notification and see the transaction queued', () => {
-    createtx.waitForProposeRequest()
-    createtx.clickViewTransaction()
-    createtx.verifySingleTxPage()
-    createtx.verifyQueueLabel()
-    createtx.verifyTransactionSummary(sendValue)
+  it('[SMOKE] Verify address input resolves a valid ENS name', () => {
+    createtx.typeRecipientAddress(constants.ENS_TEST_SEPOLIA)
+    createtx.verifyENSResolves(staticSafes.SEP_STATIC_SAFE_6)
+  })
+
+  it('[SMOKE] Verify error message for invalid amount input', () => {
+    createtx.clickOnTokenselectorAndSelectSepoliaEth()
+    createtx.verifyAmountLargerThanCurrentBalance()
+  })
+
+  it('[SMOKE] Verify nonce tooltip warning messages', () => {
+    createtx.changeNonce(0)
+    createtx.verifyTooltipMessage(constants.nonceTooltipMsg.lowerThanCurrent + currentNonce.toString())
+    createtx.changeNonce(currentNonce + 53)
+    createtx.verifyTooltipMessage(constants.nonceTooltipMsg.higherThanRecommended)
+    createtx.changeNonce(currentNonce + 150)
+    createtx.verifyTooltipMessage(constants.nonceTooltipMsg.muchHigherThanRecommended)
   })
 })
