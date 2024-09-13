@@ -1,5 +1,6 @@
 import type { ReactElement, ReactNode } from 'react'
 import { SvgIcon, Typography } from '@mui/material'
+import FileOpenIcon from '@mui/icons-material/FileOpen'
 import GitHubIcon from '@mui/icons-material/GitHub'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -79,6 +80,11 @@ const Footer = (): ReactElement | null => {
           <li>{'This is an unofficial distribution of Safe{Wallet}'}</li>
         )}
 
+        <li>
+          <ExternalLink href="https://protofire.io/" noIcon>
+            <SvgIcon component={FileOpenIcon} inheritViewBox fontSize="inherit" sx={{ mr: 0.5 }} /> Protofire
+          </ExternalLink>
+        </li>
         <li>
           <ExternalLink href={`${packageJson.homepage}/releases/tag/v${packageJson.version}`} noIcon>
             <SvgIcon component={GitHubIcon} inheritViewBox fontSize="inherit" sx={{ mr: 0.5 }} /> v{packageJson.version}
