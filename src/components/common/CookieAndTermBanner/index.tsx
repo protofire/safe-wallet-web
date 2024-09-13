@@ -41,7 +41,7 @@ export const CookieAndTermBanner = ({
   const dispatch = useAppDispatch()
   const cookies = useAppSelector(selectCookies)
 
-  const { register, watch, getValues, setValue } = useForm({
+  const { getValues } = useForm({
     defaultValues: {
       [CookieAndTermType.TERMS]: true,
       [CookieAndTermType.NECESSARY]: true,
@@ -54,12 +54,6 @@ export const CookieAndTermBanner = ({
   const handleAccept = () => {
     dispatch(saveCookieAndTermConsent(getValues()))
     dispatch(closeCookieBanner())
-  }
-
-  const handleAcceptAll = () => {
-    setValue(CookieAndTermType.UPDATES, true)
-    setValue(CookieAndTermType.ANALYTICS, true)
-    setTimeout(handleAccept, 300)
   }
 
   return (
@@ -76,8 +70,7 @@ export const CookieAndTermBanner = ({
             <Typography variant="body2" mb={2}>
               By browsing this page, you accept our{' '}
               <ExternalLink href={AppRoutes.terms}>Terms & Conditions</ExternalLink> (last updated July 2024) and the
-              use of necessary cookies. By clicking &quot;Accept all&quot; you additionally agree to the use of Beamer
-              and Analytics cookies as listed below. <ExternalLink href={AppRoutes.cookie}>Cookie policy</ExternalLink>
+              use of necessary cookies.
             </Typography>
 
             <Grid container alignItems="center" gap={4}>
@@ -86,28 +79,6 @@ export const CookieAndTermBanner = ({
                   <CookieCheckbox checkboxProps={{ id: 'necessary', disabled: true }} label="Necessary" checked />
                   <br />
                   <Typography variant="body2">Locally stored data for core functionality</Typography>
-                </Box>
-
-                <Box mb={2}>
-                  <CookieCheckbox
-                    checkboxProps={{ ...register(CookieAndTermType.UPDATES), id: 'beamer' }}
-                    label="Beamer"
-                    checked={watch(CookieAndTermType.UPDATES)}
-                  />
-                  <br />
-                  <Typography variant="body2">New features and product announcements</Typography>
-                </Box>
-
-                <Box>
-                  <CookieCheckbox
-                    checkboxProps={{ ...register(CookieAndTermType.ANALYTICS), id: 'ga' }}
-                    label="Analytics"
-                    checked={watch(CookieAndTermType.ANALYTICS)}
-                  />
-                  <br />
-                  <Typography variant="body2">
-                    Opt in for Google Analytics cookies to help us analyze app usage patterns.
-                  </Typography>
                 </Box>
               </Grid>
             </Grid>
@@ -119,12 +90,6 @@ export const CookieAndTermBanner = ({
                     Save settings
                   </Button>
                 </Typography>
-              </Grid>
-
-              <Grid item>
-                <Button onClick={handleAcceptAll} variant="contained" color="secondary" size="small" disableElevation>
-                  Accept all
-                </Button>
               </Grid>
             </Grid>
           </Grid>

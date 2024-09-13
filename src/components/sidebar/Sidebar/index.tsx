@@ -43,11 +43,6 @@ const Sidebar = (): ReactElement => {
         <SidebarNavigation />
 
         <Box flex={1} />
-
-        <Divider flexItem />
-
-        {/* What's new + Need help? */}
-        <SidebarFooter />
       </div>
 
       <Drawer variant="temporary" anchor="left" open={isDrawerOpen} onClose={onDrawerToggle}>
