@@ -18,10 +18,12 @@ import useSafeAddress from '@/hooks/useSafeAddress'
 import BatchIndicator from '@/components/batch/BatchIndicator'
 import WalletConnect from '@/features/walletconnect/components'
 import { FEATURES } from '@/utils/chains'
-import { useHasFeature } from '@/hooks/useChains'
+import { useCurrentChain, useHasFeature } from '@/hooks/useChains'
 import Track from '@/components/common/Track'
 import { OVERVIEW_EVENTS, OVERVIEW_LABELS } from '@/services/analytics'
 import { useSafeTokenEnabled } from '@/hooks/useSafeTokenEnabled'
+import Image from 'next/image'
+import useChainId from '@/hooks/useChainId'
 
 type HeaderProps = {
   onMenuToggle?: Dispatch<SetStateAction<boolean>>
@@ -37,6 +39,8 @@ function getLogoLink(router: ReturnType<typeof useRouter>): Url {
 }
 
 const Header = ({ onMenuToggle, onBatchToggle }: HeaderProps): ReactElement => {
+  const currentChain = useCurrentChain()
+  const chainId = useChainId()
   const safeAddress = useSafeAddress()
   const showSafeToken = useSafeTokenEnabled()
   const router = useRouter()
@@ -77,7 +81,11 @@ const Header = ({ onMenuToggle, onBatchToggle }: HeaderProps): ReactElement => {
 
       <div className={classnames(css.element, css.hideMobile, css.logo)}>
         <Link href={logoHref} passHref>
-          <SafeLogo alt="Safe logo" />
+          {currentChain?.chainLogoUri ? (
+            <Image src={currentChain?.chainLogoUri || ''} alt="Chain logo" width={30} height={30} />
+          ) : (
+            <SafeLogo alt="Safe logo" />
+          )}
         </Link>
       </div>
 
