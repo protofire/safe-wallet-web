@@ -4,7 +4,7 @@ import lightPalette from '@/components/theme/lightPalette'
 import darkPalette from '@/components/theme/darkPalette'
 
 const descriptionText =
-  'Protofire has partner with Safe{Wallet} to provide the most trusted smart account wallet in severall networks.'
+  'Protofire has partner with Safe{Wallet} to provide the most trusted smart account wallet in several networks.'
 const titleText = 'Protofire Safe'
 
 const MetaTags = ({ prefetchUrl }: { prefetchUrl: string }) => (
