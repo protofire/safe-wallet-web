@@ -3,8 +3,9 @@ import { ContentSecurityPolicy, StrictTransportSecurity } from '@/config/securit
 import lightPalette from '@/components/theme/lightPalette'
 import darkPalette from '@/components/theme/darkPalette'
 
-const descriptionText = 'Safe{Wallet} is the most trusted smart account wallet on Ethereum with over $100B secured.'
-const titleText = 'Safe{Wallet}'
+const descriptionText =
+  'Protofire has partner with Safe{Wallet} to provide the most trusted smart account wallet in severall networks.'
+const titleText = 'Protofire Safe'
 
 const MetaTags = ({ prefetchUrl }: { prefetchUrl: string }) => (
   <>
