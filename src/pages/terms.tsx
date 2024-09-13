@@ -831,7 +831,7 @@ const Terms: NextPage = () => {
   return (
     <>
       <Head>
-        <title>{'Safe{Wallet} – Terms'}</title>
+        <title>Protofire Safe – Terms</title>
       </Head>
 
       <main>{IS_OFFICIAL_HOST && <SafeTerms />}</main>

@@ -1004,7 +1004,7 @@ const PrivacyPolicy: NextPage = () => {
   return (
     <>
       <Head>
-        <title>{'Safe{Wallet} – Privacy policy'}</title>
+        <title>Protofire Safe – Privacy policy</title>
       </Head>
 
       <main>{IS_OFFICIAL_HOST && <SafePrivacyPolicy />}</main>
