@@ -7,6 +7,7 @@ import css from './styles.module.css'
 import { AppRoutes } from '@/config/routes'
 import packageJson from '../../../../package.json'
 import ExternalLink from '../ExternalLink'
+import { HELP_CENTER_URL } from '@/config/constants'
 
 const footerPages = [
   AppRoutes.welcome.index,
@@ -28,6 +29,11 @@ const Footer = (): ReactElement | null => {
   return (
     <footer className={css.container}>
       <ul>
+        <li>
+          <ExternalLink href={HELP_CENTER_URL} noIcon sx={{ span: { textDecoration: 'underline' } }}>
+            Help
+          </ExternalLink>
+        </li>
         <li>
           <ExternalLink href="https://protofire.io/" noIcon>
             <SvgIcon component={FileOpenIcon} inheritViewBox fontSize="inherit" sx={{ mr: 0.5 }} /> Protofire

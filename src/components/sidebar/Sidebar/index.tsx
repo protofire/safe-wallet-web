@@ -1,5 +1,5 @@
 import { useCallback, useState, type ReactElement } from 'react'
-import { Box, Divider, Drawer } from '@mui/material'
+import { Divider, Drawer } from '@mui/material'
 import ChevronRight from '@mui/icons-material/ChevronRight'
 
 import ChainIndicator from '@/components/common/ChainIndicator'
@@ -9,6 +9,7 @@ import SidebarNavigation from '@/components/sidebar/SidebarNavigation'
 import css from './styles.module.css'
 import { trackEvent, OVERVIEW_EVENTS } from '@/services/analytics'
 import MyAccounts from '@/components/welcome/MyAccounts'
+import SidebarFooter from '../SidebarFooter'
 
 const Sidebar = (): ReactElement => {
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false)
@@ -41,7 +42,9 @@ const Sidebar = (): ReactElement => {
         {/* Nav menu */}
         <SidebarNavigation />
 
-        <Box flex={1} />
+        <Divider flexItem />
+        {/* What's new + Need help? */}
+        <SidebarFooter />
       </div>
 
       <Drawer variant="temporary" anchor="left" open={isDrawerOpen} onClose={onDrawerToggle}>
