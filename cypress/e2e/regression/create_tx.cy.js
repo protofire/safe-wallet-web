@@ -32,13 +32,13 @@ describe('Create transactions tests', () => {
     createtx.clickOnSendTokensBtn()
   })
 
+  // TODO: Added to prod
   it('Verify submitting a tx and that clicking on notification shows the transaction in queue', () => {
     happyPathToStepTwo()
     createtx.verifySubmitBtnIsEnabled()
     createtx.changeNonce(14)
     cy.wait(1000)
     createtx.clickOnSignTransactionBtn()
-    createtx.waitForProposeRequest()
     createtx.clickViewTransaction()
     createtx.verifySingleTxPage()
     createtx.verifyQueueLabel()

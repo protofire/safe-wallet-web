@@ -2,6 +2,7 @@ import * as constants from '../../support/constants'
 import * as main from '../pages/main.page'
 import * as assets from '../pages/assets.pages'
 import { getSafes, CATEGORIES } from '../../support/safes/safesHandler.js'
+import * as ls from '../../support/localstorage_data.js'
 
 const ASSET_NAME_COLUMN = 0
 const TOKEN_AMOUNT_COLUMN = 1
@@ -17,10 +18,16 @@ describe('Tokens tests', () => {
   })
   beforeEach(() => {
     cy.visit(constants.BALANCE_URL + staticSafes.SEP_STATIC_SAFE_2)
-    cy.clearLocalStorage()
-    main.acceptCookies()
+    cy.clearLocalStorage().then(() => {
+      main.addToLocalStorage(constants.localStorageKeys.SAFE_v2_cookies, ls.cookies.acceptedCookies)
+      main.addToLocalStorage(
+        constants.localStorageKeys.SAFE_v2__tokenlist_onboarding,
+        ls.cookies.acceptedTokenListOnboarding,
+      )
+    })
   })
 
+  // TODO: Added to prod
   it('Verify that non-native tokens are present and have balance', () => {
     assets.selectTokenList(assets.tokenListOptions.allTokens)
     assets.verifyBalance(assets.currencyDaiCap, TOKEN_AMOUNT_COLUMN, assets.currencyDaiAlttext)
@@ -170,6 +177,7 @@ describe('Tokens tests', () => {
     assets.verifyTokenBalanceOrder('descending')
   })
 
+  // TODO: Added to prod
   //Include in smoke.
   it('Verify that when owner is disconnected, Send button is disabled', () => {
     assets.selectTokenList(assets.tokenListOptions.allTokens)
@@ -177,6 +185,7 @@ describe('Tokens tests', () => {
     assets.VerifySendButtonIsDisabled()
   })
 
+  // TODO: Added to prod
   it('Verify that when connected user is not owner, Send button is disabled', () => {
     cy.visit(constants.BALANCE_URL + staticSafes.SEP_STATIC_SAFE_3)
     assets.selectTokenList(assets.tokenListOptions.allTokens)

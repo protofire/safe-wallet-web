@@ -10,7 +10,8 @@ import * as wallet from '../../support/utils/wallet.js'
 
 let staticSafes = []
 const walletCredentials = JSON.parse(Cypress.env('CYPRESS_WALLET_CREDENTIALS'))
-const signer = walletCredentials.OWNER_4_PRIVATE_KEY
+// DO NOT use OWNER_2_PRIVATE_KEY for safe creation. Used for CF safes.
+const signer = walletCredentials.OWNER_2_PRIVATE_KEY
 
 const txOrder = [
   'Activate Safe now',
@@ -28,7 +29,7 @@ describe('CF Safe regression tests', () => {
 
   beforeEach(() => {
     cy.clearLocalStorage()
-    cy.visit(constants.homeUrl + staticSafes.SEP_STATIC_SAFE_14)
+    cy.visit(constants.homeUrl + staticSafes.SEP_STATIC_SAFE_0)
     main.acceptCookies()
   })
 
@@ -39,10 +40,10 @@ describe('CF Safe regression tests', () => {
     owner.waitForConnectionStatus()
     createwallet.clickOnAddFundsBtn()
     main.verifyElementsIsVisible([createwallet.qrCode])
-    navigation.clickOnModalCloseBtn()
+    navigation.clickOnModalCloseBtn(0)
 
     createwallet.clickOnCreateTxBtn()
-    navigation.clickOnModalCloseBtn()
+    navigation.clickOnModalCloseBtn(0)
   })
 
   it('Verify "0 out of 2 step completed" is shown in the dashboard', () => {
@@ -87,7 +88,7 @@ describe('CF Safe regression tests', () => {
     owner.waitForConnectionStatus()
     createwallet.clickOnCreateTxBtn()
     createwallet.clickOnTxType(txOrder[0])
-    main.verifyElementsExist([createwallet.activateAccountBtn])
+    cy.contains(createwallet.deployWalletStr)
   })
 
   it('Verify "Add another Owner" takes to a tx Add owner', () => {
@@ -140,21 +141,22 @@ describe('CF Safe regression tests', () => {
   it('Verify "Notifications" in the settings are disabled', () => {
     main.addToLocalStorage(constants.localStorageKeys.SAFE_v2__undeployedSafes, ls.undeployedSafe.safe1)
     cy.reload()
-    cy.visit(constants.notificationsUrl + staticSafes.SEP_STATIC_SAFE_14)
+    cy.visit(constants.notificationsUrl + staticSafes.SEP_STATIC_SAFE_0)
     createwallet.checkNotificationsSwitchIs(constants.enabledStates.disabled)
   })
 
   it('Verify in assets, that a "Add funds" block is present', () => {
     main.addToLocalStorage(constants.localStorageKeys.SAFE_v2__undeployedSafes, ls.undeployedSafe.safe1)
     cy.reload()
-    cy.visit(constants.BALANCE_URL + staticSafes.SEP_STATIC_SAFE_14)
+    cy.visit(constants.BALANCE_URL + staticSafes.SEP_STATIC_SAFE_0)
     main.verifyElementsIsVisible([createwallet.addFundsSection, createwallet.noTokensAlert])
   })
 
   it('Verify clicking on "Activate now" button opens safe activation flow', () => {
     main.addToLocalStorage(constants.localStorageKeys.SAFE_v2__undeployedSafes, ls.undeployedSafe.safe1)
-    cy.reload()
-    cy.visit(constants.BALANCE_URL + staticSafes.SEP_STATIC_SAFE_14)
+    cy.visit(constants.BALANCE_URL + staticSafes.SEP_STATIC_SAFE_0)
+    wallet.connectSigner(signer)
+    owner.waitForConnectionStatus()
     createwallet.clickOnActivateAccountBtn()
     main.verifyElementsIsVisible([createwallet.activateAccountBtn])
   })

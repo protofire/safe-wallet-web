@@ -134,9 +134,7 @@ describe('Safe creation tests', () => {
         main.addToLocalStorage(constants.localStorageKeys.SAFE_v2__addressBook, ls.addressBookData.sameOwnerName),
       )
       .then(() => {
-        wallet.connectSigner(signer)
-        createwallet.clickOnContinueWithWalletBtn()
-        createwallet.clickOnCreateNewSafeBtn()
+        createwallet.waitForConnectionMsgDisappear()
         createwallet.clickOnNextBtn()
         createwallet.clickOnAddNewOwnerBtn()
         createwallet.clickOnSignerAddressInput(1)
