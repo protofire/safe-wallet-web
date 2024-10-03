@@ -40,6 +40,7 @@ import type {
   NativeStakingWithdrawConfirmationView,
   NativeStakingValidatorsExitConfirmationView,
   StakingTxInfo,
+  TransactionData,
 } from '@safe-global/safe-gateway-typescript-sdk'
 import {
   ConfirmationViewTypes,
@@ -56,6 +57,8 @@ import { sameAddress } from '@/utils/addresses'
 import type { NamedAddress } from '@/components/new-safe/create/types'
 import type { RecoveryQueueItem } from '@/features/recovery/services/recovery-state'
 import { ethers } from 'ethers'
+import { getSafeToL2MigrationDeployment } from '@safe-global/safe-deployments'
+import { Safe_to_l2_migration__factory } from '@/types/contracts'
 
 export const isTxQueued = (value: TransactionStatus): boolean => {
   return [TransactionStatus.AWAITING_CONFIRMATIONS, TransactionStatus.AWAITING_EXECUTION].includes(value)
@@ -82,6 +85,18 @@ export const isMultisigDetailedExecutionInfo = (value?: DetailedExecutionInfo): 
 
 export const isModuleDetailedExecutionInfo = (value?: DetailedExecutionInfo): value is ModuleExecutionDetails => {
   return value?.type === DetailedExecutionInfoType.MODULE
+}
+
+export const isMigrateToL2TxData = (value: TransactionData | undefined): boolean => {
+  const safeToL2MigrationDeployment = getSafeToL2MigrationDeployment()
+  const safeToL2MigrationAddress = safeToL2MigrationDeployment?.defaultAddress
+  const safeToL2MigrationInterface = Safe_to_l2_migration__factory.createInterface()
+
+  if (sameAddress(value?.to.value, safeToL2MigrationAddress)) {
+    const migrateToL2Selector = safeToL2MigrationInterface?.getFunction('migrateToL2')?.selector
+    return migrateToL2Selector && value?.hexData ? value.hexData?.startsWith(migrateToL2Selector) : false
+  }
+  return false
 }
 
 // TransactionInfo type guards
@@ -117,6 +132,13 @@ export const isMultiSendTxInfo = (value: TransactionInfo): value is MultiSend =>
 
 export const isOrderTxInfo = (value: TransactionInfo): value is Order => {
   return isSwapOrderTxInfo(value) || isTwapOrderTxInfo(value)
+}
+
+export const isMigrateToL2TxInfo = (value: TransactionInfo): value is Custom => {
+  const safeToL2MigrationDeployment = getSafeToL2MigrationDeployment()
+  const safeToL2MigrationAddress = safeToL2MigrationDeployment?.defaultAddress
+
+  return isCustomTxInfo(value) && sameAddress(value.to.value, safeToL2MigrationAddress)
 }
 
 export const isSwapOrderTxInfo = (value: TransactionInfo): value is SwapOrder => {

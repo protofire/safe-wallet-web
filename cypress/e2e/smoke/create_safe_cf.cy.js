@@ -39,6 +39,7 @@ describe('[SMOKE] CF Safe creation tests', () => {
         },
       ]
       checkDataLayerEvents(safe_created)
+      createwallet.clickOnLetsGoBtn()
       createwallet.verifyCFSafeCreated()
     })
   })

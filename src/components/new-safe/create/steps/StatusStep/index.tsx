@@ -18,6 +18,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { getLatestSafeVersion } from '@/utils/chains'
+import { isPredictedSafeProps } from '@/features/counterfactual/utils'
 
 const SPEED_UP_THRESHOLD_IN_SECONDS = 15
 
@@ -74,7 +75,7 @@ export const CreateSafeStatus = ({
   const tryAgain = () => {
     trackEvent(CREATE_SAFE_EVENTS.RETRY_CREATE_SAFE)
 
-    if (!pendingSafe) {
+    if (!pendingSafe || !isPredictedSafeProps(pendingSafe.props)) {
       setStep(0)
       return
     }
@@ -84,6 +85,7 @@ export const CreateSafeStatus = ({
     setStepData?.({
       owners: pendingSafe.props.safeAccountConfig.owners.map((owner) => ({ name: '', address: owner })),
       name: '',
+      networks: [],
       threshold: pendingSafe.props.safeAccountConfig.threshold,
       saltNonce: Number(pendingSafe.props.safeDeploymentConfig?.saltNonce),
       safeAddress,
