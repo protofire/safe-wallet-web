@@ -56,3 +56,5 @@ yalc.lock
 /public/*.js.LICENSE.txt
 certificates
 *storybook.log
+.vscode/launch.json
+.cursorrules
