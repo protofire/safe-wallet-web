@@ -157,7 +157,7 @@ const SwapWidget = () => {
     return (
       <Box>
         <Typography>
-          Failed to load Safe information. Please ensure you're using this app within a Safe environment.
+          Failed to load Safe information. Please ensure you are using this app within a Safe environment.
         </Typography>
         <Typography>Debug info:</Typography>
         <pre>{JSON.stringify({ config, safeInfo }, null, 2)}</pre>
