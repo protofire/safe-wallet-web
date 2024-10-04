@@ -16,11 +16,13 @@ const adjustEthAddress = (address: string) => {
 }
 
 const SwapWidgetNoSSR = dynamic(() => import('@/features/swap'), { ssr: false })
+const SwapWidgetLifiNoSSR = dynamic(() => import('@/features/swaplifi'), { ssr: false })
 
 const SwapPage: NextPage = () => {
   const router = useRouter()
   const { token, amount } = router.query
   const isFeatureEnabled = useHasFeature(FEATURES.NATIVE_SWAPS)
+  const isLifiEnabled = useHasFeature(FEATURES.NATIVE_SWAPS_LIFI)
 
   let sell = undefined
   if (token && amount) {
@@ -37,13 +39,15 @@ const SwapPage: NextPage = () => {
       </Head>
 
       <main style={{ height: 'calc(100vh - 52px)' }}>
-        {isFeatureEnabled === true ? (
+        {isLifiEnabled ? (
+          <SwapWidgetLifiNoSSR />
+        ) : isFeatureEnabled ? (
           <SwapWidgetNoSSR sell={sell} />
-        ) : isFeatureEnabled === false ? (
+        ) : (
           <Typography textAlign="center" my={3}>
             Swaps are not supported on this network.
           </Typography>
-        ) : null}
+        )}
       </main>
     </>
   )

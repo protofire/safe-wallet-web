@@ -35,11 +35,12 @@ export enum FEATURES {
   ZODIAC_ROLES = 'ZODIAC_ROLES',
   SAFE_141 = 'SAFE_141',
   STAKING = 'STAKING',
+  NATIVE_SWAPS_LIFI = 'NATIVE_SWAPS_LIFI',
 }
 
 export const FeatureRoutes = {
   [AppRoutes.apps.index]: FEATURES.SAFE_APPS,
-  [AppRoutes.swap]: FEATURES.NATIVE_SWAPS,
+  [AppRoutes.swap]: FEATURES.NATIVE_SWAPS || FEATURES.NATIVE_SWAPS_LIFI,
   [AppRoutes.stake]: FEATURES.STAKING,
   [AppRoutes.balances.nfts]: FEATURES.ERC721,
   [AppRoutes.settings.notifications]: FEATURES.PUSH_NOTIFICATIONS,
