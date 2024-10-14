@@ -1,5 +1,5 @@
 import type { ReactElement, ReactNode } from 'react'
-import { Typography } from '@mui/material'
+import { SvgIcon, Typography } from '@mui/material'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import css from './styles.module.css'
@@ -9,6 +9,8 @@ import packageJson from '../../../../package.json'
 import ExternalLink from '../ExternalLink'
 import MUILink from '@mui/material/Link'
 import { IS_OFFICIAL_HOST } from '@/config/constants'
+import { darkPalette } from '@safe-global/safe-react-components'
+import ProtofireLogo from '@/public/images/protofire-logo.svg'
 
 const footerPages = [
   AppRoutes.welcome,
@@ -78,6 +80,20 @@ const Footer = (): ReactElement | null => {
         {/*<li>*/}
         {/*  <AppstoreButton placement="footer" />*/}
         {/*</li>*/}
+        <li>
+          <Typography variant="caption">
+            Supported by{' '}
+            <SvgIcon
+              component={ProtofireLogo}
+              inheritViewBox
+              fontSize="small"
+              sx={{ verticalAlign: 'middle', mx: 0.5 }}
+            />
+            <MUILink href="https://protofire.io" sx={{ color: darkPalette.primary.main, textDecoration: 'none' }}>
+              Protofire
+            </MUILink>
+          </Typography>
+        </li>
       </ul>
     </footer>
   )
