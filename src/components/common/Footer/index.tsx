@@ -49,9 +49,6 @@ const Footer = (): ReactElement | null => {
           </ExternalLink>
         </li>
         <li>
-          <AppstoreButton placement="footer" />
-        </li>
-        <li>
           <Typography variant="caption">
             Supported by{' '}
             <SvgIcon
