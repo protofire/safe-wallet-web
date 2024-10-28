@@ -34,7 +34,7 @@ const LifiSwapWidget = () => {
     integrator: 'protofire',
     variant: 'compact',
     subvariant: 'default',
-    appearance: darkMode ? 'light' : 'dark',
+    appearance: darkMode ? 'dark' : 'light',
     toAddress: {
       address: safeAddress,
       chainType: ChainType.EVM,
@@ -48,7 +48,7 @@ const LifiSwapWidget = () => {
   useEffect(() => {
     setParams((params) => ({
       ...params,
-      appearance: darkMode ? 'light' : 'dark',
+      appearance: darkMode ? 'dark' : 'light',
       fromChain: +chainId,
     }))
     const window = iframeRef.current?.contentWindow
