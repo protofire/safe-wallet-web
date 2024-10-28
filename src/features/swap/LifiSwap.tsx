@@ -19,7 +19,6 @@ import AppFrame from '@/components/safe-apps/AppFrame'
 import { getEmptySafeApp } from '@/components/safe-apps/utils'
 import { LIFI_WIDGET_URL } from '@/config/constants'
 
-
 const LifiSwapWidget = () => {
   // const { palette } = useTheme()
   // const darkMode = useDarkMode()
@@ -49,7 +48,6 @@ const LifiSwapWidget = () => {
 
   // const iframeRef: MutableRefObject<HTMLIFrameElement | null> = useRef<HTMLIFrameElement | null>(null)
 
-
   // useEffect(() => {
   //   const iframeElement = document.querySelector('#lifiWidget iframe')
   //   if (iframeElement) {
@@ -73,7 +71,6 @@ const LifiSwapWidget = () => {
   //   [darkMode],
   // )
 
-
   // useCustomAppCommunicator(iframeRef, appData, chain)
 
   if (!isConsentAccepted) {
@@ -90,12 +87,13 @@ const LifiSwapWidget = () => {
 
   return (
     // TODO: wrap lifi into iframe
-    // TODO: pass config to iframe 
+    // TODO: pass config to iframe
     <Box className={css.swapWidget} id="lifiWidget">
       <AppFrame
         appUrl={LIFI_WIDGET_URL}
         allowedFeaturesList="clipboard-read; clipboard-write"
-        safeAppFromManifest={safeAppData} />
+        safeAppFromManifest={safeAppData}
+      />
 
       {/* The preferred scenario below */}
       {/* {safeLoading ? <WidgetSkeleton config={params!} /> :  <LiFiWidget

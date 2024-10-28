@@ -1,23 +1,18 @@
 // import { type MutableRefObject, useEffect, useRef, useState } from 'react'
-import { Box, useTheme } from '@mui/material'
+import { Box } from '@mui/material'
 // import {
 //   type SafeAppData,
 // } from '@safe-global/safe-gateway-typescript-sdk/dist/types/safe-apps'
-import { useCurrentChain } from '@/hooks/useChains'
-import { useDarkMode } from '@/hooks/useDarkMode'
 
 import css from './styles.module.css'
-import useSafeInfo from '@/hooks/useSafeInfo'
 import useSwapConsent from './useSwapConsent'
 import Disclaimer from '@/components/common/Disclaimer'
 import WidgetDisclaimer from '@/components/common/WidgetDisclaimer'
-import useChainId from '@/hooks/useChainId'
 
 // import { ChainType, WidgetConfig } from '@lifi/widget'
 import AppFrame from '@/components/safe-apps/AppFrame'
 import { getEmptySafeApp } from '@/components/safe-apps/utils'
 import { LIFI_WIDGET_URL } from '@/config/constants'
-
 
 const LifiSwapWidget = () => {
   // const { palette } = useTheme()
@@ -48,7 +43,6 @@ const LifiSwapWidget = () => {
 
   // const iframeRef: MutableRefObject<HTMLIFrameElement | null> = useRef<HTMLIFrameElement | null>(null)
 
-
   // useEffect(() => {
   //   const iframeElement = document.querySelector('#lifiWidget iframe')
   //   if (iframeElement) {
@@ -72,7 +66,6 @@ const LifiSwapWidget = () => {
   //   [darkMode],
   // )
 
-
   // useCustomAppCommunicator(iframeRef, appData, chain)
 
   if (!isConsentAccepted) {
@@ -93,7 +86,8 @@ const LifiSwapWidget = () => {
       <AppFrame
         appUrl={safeAppData.url}
         allowedFeaturesList="clipboard-read; clipboard-write"
-        safeAppFromManifest={safeAppData} />
+        safeAppFromManifest={safeAppData}
+      />
 
       {/* The preferred scenario below */}
       {/* {safeLoading ? <WidgetSkeleton config={params!} /> :  <LiFiWidget
