@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "next dev",
     "start": "next dev",
-    "build": "next build",
+    "build": "NODE_OPTIONS='--max-old-space-size=4096' next build",
     "lint": "tsc && next lint",
     "lint:fix": "next lint --fix",
     "prettier": "prettier -w \"{src,cypress,mocks,scripts}/**/*.{ts,tsx,css,js}\"",
@@ -50,7 +50,7 @@
     "@emotion/server": "^11.11.0",
     "@emotion/styled": "^11.11.0",
     "@gnosis.pm/zodiac": "^4.0.3",
-    "@lifi/widget": "3.8.0",
+    "@lifi/widget": "^3.9.0",
     "@mui/icons-material": "^5.14.20",
     "@mui/material": "5.14.20",
     "@mui/x-date-pickers": "^5.0.20",
