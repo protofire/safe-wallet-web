@@ -11,11 +11,14 @@ import WidgetDisclaimer from '@/components/common/WidgetDisclaimer'
 import AppFrame from '@/components/safe-apps/AppFrame'
 import { getEmptySafeApp } from '@/components/safe-apps/utils'
 import { LIFI_WIDGET_URL } from '@/config/constants'
-import { SafeAppAccessPolicyTypes, SafeAppData, SafeAppFeatures } from '@safe-global/safe-gateway-typescript-sdk'
-import { MutableRefObject, useEffect, useMemo, useRef, useState } from 'react'
+import type { SafeAppData } from '@safe-global/safe-gateway-typescript-sdk'
+import { SafeAppAccessPolicyTypes, SafeAppFeatures } from '@safe-global/safe-gateway-typescript-sdk'
+import type { MutableRefObject } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useDarkMode } from '@/hooks/useDarkMode'
 import useSafeInfo from '@/hooks/useSafeInfo'
-import { WidgetConfig, ChainType } from '@lifi/widget'
+import type { WidgetConfig } from '@lifi/widget'
+import { ChainType } from '@lifi/widget'
 import useChainId from '@/hooks/useChainId'
 
 const LifiSwapWidget = () => {
@@ -24,7 +27,6 @@ const LifiSwapWidget = () => {
   const chainId = useChainId()
   const { safeAddress, safeLoading } = useSafeInfo()
   const { isConsentAccepted, onAccept } = useSwapConsent()
-  const hasSentInitialMessage = useRef(false)
 
   const supportedChains = ['42161', '10', '8453', '56', '11235', '59144']
 
@@ -53,6 +55,8 @@ const LifiSwapWidget = () => {
     if (window) {
       window.postMessage(params, '*')
     }
+    // Temp
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [palette, darkMode, chainId])
 
   useEffect(() => {
@@ -64,7 +68,7 @@ const LifiSwapWidget = () => {
         window.postMessage(params, '*')
       }
     }
-  }, [isConsentAccepted, safeLoading])
+  }, [isConsentAccepted, safeLoading, params])
 
   const appData: SafeAppData = useMemo(
     () => ({
@@ -79,6 +83,8 @@ const LifiSwapWidget = () => {
       features: [SafeAppFeatures.BATCHED_TRANSACTIONS],
       socialProfiles: [],
     }),
+    // Temp
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [darkMode],
   )
 
