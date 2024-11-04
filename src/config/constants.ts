@@ -4,10 +4,10 @@ export const IS_PRODUCTION = process.env.NEXT_PUBLIC_IS_PRODUCTION === 'true'
 export const IS_DEV = process.env.NODE_ENV === 'development'
 
 export const GATEWAY_URL_PRODUCTION =
-  process.env.NEXT_PUBLIC_GATEWAY_URL_PRODUCTION || 'https://gateway.safe.protofire.io'
+  process.env.NEXT_PUBLIC_GATEWAY_URL_PRODUCTION || 'https://sandbox-gateway.safe.protofire.io'
 export const GATEWAY_URL_STAGING =
-  process.env.NEXT_PUBLIC_GATEWAY_URL_STAGING || 'https://gateway.stage.safe.protofire.io'
-export const LIFI_WIDGET_URL = process.env.NEXT_LIFI_WIDGET_URL || 'https://lifi-widget-next.vercel.app/'
+  process.env.NEXT_PUBLIC_GATEWAY_URL_STAGING || 'https://sandbox-gateway.safe.protofire.io'
+export const LIFI_WIDGET_URL = process.env.NEXT_LIFI_WIDGET_URL || 'https://lifi-swap.safe.protofire.io/'
 
 // Magic numbers
 export const POLLING_INTERVAL = 15_000

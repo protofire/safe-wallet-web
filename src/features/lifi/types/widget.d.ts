@@ -1,17 +1,7 @@
-import type {
-  BaseToken,
-  ChainType,
-  ContractCall,
-  Order,
-  RouteExtended,
-  RouteOptions,
-  SDKConfig,
-  StaticToken,
-  Token,
-} from '@lifi/sdk'
+import type { BaseToken, ChainType, ContractCall, Order, RouteOptions, SDKConfig, StaticToken, Token } from '@lifi/sdk'
 import type { Components, PaletteMode, PaletteOptions, Shape, Theme } from '@mui/material'
 import type { TypographyOptions } from '@mui/material/styles/createTypography.js'
-import type { CSSProperties, FC, MutableRefObject, ReactNode, RefObject } from 'react'
+import type { CSSProperties, MutableRefObject, ReactNode, RefObject } from 'react'
 import type {
   CoinbaseWalletParameters,
   MetaMaskParameters,
@@ -79,6 +69,15 @@ export interface WidgetWalletConfig {
   coinbase?: CoinbaseWalletParameters
   metaMask?: MetaMaskParameters
   safe?: SafeParameters
+  /**
+   * Determines whether the widget should provide partial wallet management functionality.
+   *
+   * In partial mode, external wallet management will be used for "opt-out" providers,
+   * while the internal management is applied for any remaining providers that do not opt out.
+   * This allows a flexible balance between the integrator’s custom wallet menu and the widget’s native wallet menu.
+   * @default false
+   */
+  usePartialWalletManagement?: boolean
 }
 export interface WidgetSDKConfig
   extends Omit<SDKConfig, 'apiKey' | 'disableVersionCheck' | 'integrator' | 'routeOptions' | 'widgetVersion'> {
@@ -111,12 +110,6 @@ export interface WidgetFeeConfig {
    * @returns A promise that resolves to the calculated fee as a number (e.g., 0.03 represents a 3% fee)
    */
   calculateFee?(params: CalculateFeeParams): Promise<number | undefined>
-  /**
-   * @internal
-   */
-  _vcComponent: FC<{
-    route: RouteExtended
-  }>
 }
 export interface ToAddress {
   name?: string
@@ -158,9 +151,6 @@ export interface WidgetConfig {
   contractTool?: WidgetContractTool
   integrator: string
   apiKey?: string
-  /**
-   * @deprecated Use `feeConfig` instead.
-   */
   fee?: number
   feeConfig?: WidgetFeeConfig
   referrer?: string

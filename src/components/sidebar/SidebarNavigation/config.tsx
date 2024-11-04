@@ -36,11 +36,11 @@ export const navItems: NavItem[] = [
     icon: <SvgIcon component={SwapIcon} inheritViewBox />,
     href: AppRoutes.swap,
   },
-  {
-    label: 'Lifi Swap',
+  /*   {
+    label: 'Swap',
     icon: <SvgIcon component={SwapIcon} inheritViewBox />,
     href: AppRoutes.lifi,
-  },
+  }, */
   {
     label: 'Stake',
     icon: <SvgIcon component={StakeIcon} inheritViewBox />,

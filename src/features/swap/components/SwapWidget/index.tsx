@@ -45,7 +45,7 @@ function SwapWidget(): ReactElement | null {
 
                 <Box display="flex" flexDirection="column" height="100%">
                   <Typography mt={1}>
-                    Experience our native swaps, powered by CoW Protocol! Trade seamlessly and efficiently with decoded
+                    Experience our native swaps, powered by LiFi Protocol! Trade seamlessly and efficiently with decoded
                     transactions that are easy to understand.
                   </Typography>
 
