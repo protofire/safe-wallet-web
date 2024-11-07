@@ -11,6 +11,7 @@ import {
   CircularProgress,
   Collapse,
   Divider,
+  ListSubheader,
   MenuItem,
   Select,
   Skeleton,
@@ -43,6 +44,8 @@ import { InfoOutlined } from '@mui/icons-material'
 import { selectUndeployedSafe } from '@/store/slices'
 import { skipToken } from '@reduxjs/toolkit/query'
 import { hasMultiChainAddNetworkFeature } from '@/features/multichain/utils/utils'
+import type { ExternalChainInfo } from '@/config/chains'
+import { EXTERNAL_NETWORKS } from '@/config/chains'
 
 const ChainIndicatorWithFiatBalance = ({
   isSelected,
@@ -286,9 +289,11 @@ const UndeployedNetworks = ({
 const NetworkSelector = ({
   onChainSelect,
   offerSafeCreation = false,
+  showExternalChains = false,
 }: {
   onChainSelect?: () => void
   offerSafeCreation?: boolean
+  showExternalChains?: boolean
 }): ReactElement => {
   const [open, setOpen] = useState<boolean>(false)
   const isDarkMode = useDarkMode()
@@ -366,6 +371,16 @@ const NetworkSelector = ({
     offerSafeCreation && trackEvent({ ...OVERVIEW_EVENTS.EXPAND_MULTI_SAFE, label: OVERVIEW_LABELS.top_bar })
   }
 
+  const renderExternalMenuItem = (value: string, chain: ExternalChainInfo) => {
+    return (
+      <MenuItem key={value} value={value} className={css.menuItem}>
+        <a href={chain.externalHref} className={css.item} target="_blank" rel="noreferrer">
+          <ChainIndicator chainId={chain.chainId} inline />
+        </a>
+      </MenuItem>
+    )
+  }
+
   return configs.length ? (
     <Select
       open={open}
@@ -413,6 +428,10 @@ const NetworkSelector = ({
           closeNetworkSelect={handleClose}
         />
       )}
+
+      {showExternalChains ? <ListSubheader className={css.listSubHeader}>safe.global</ListSubheader> : null}
+
+      {showExternalChains ? EXTERNAL_NETWORKS.map((chain) => renderExternalMenuItem(chain.chainId, chain)) : null}
     </Select>
   ) : (
     <Skeleton width={94} height={31} sx={{ mx: 2 }} />
