@@ -7,14 +7,13 @@ import useLocalStorage from '@/services/local-storage/useLocalStorage'
 import useSafeInfo from '@/hooks/useSafeInfo'
 import { useHasFeature } from '@/hooks/useChains'
 import { FEATURES } from '@/utils/chains'
-import useWallet from '@/hooks/wallets/useWallet'
 import useDebounce from '@/hooks/useDebounce'
 import css from './styles.module.css'
 import ExternalLink from '@/components/common/ExternalLink'
 import { useRouter } from 'next/router'
 
 const DISMISS_MIGRATION_BANNER_KEY = 'dismissMigrationBanner'
-const BANNER_DELAY = 2000
+const BANNER_DELAY = 1000
 
 const useDismissMigrationBanner = () => {
   const { safe } = useSafeInfo()
@@ -45,7 +44,6 @@ export const MigrationBanner = ({ children }: { children?: ReactElement }): Reac
   const isMigrationBannerEnabled = useHasFeature(FEATURES.MIGRATION_BANNER)
   const { safe } = useSafeInfo()
   const { query } = useRouter()
-  const wallet = useWallet()
   const { dismissMigrationBanner, isMigrationBannerDismissed } = useDismissMigrationBanner()
   const [acknowledgement, setAcknowledgement] = useState(isMigrationBannerDismissed)
 
@@ -53,10 +51,9 @@ export const MigrationBanner = ({ children }: { children?: ReactElement }): Reac
     setAcknowledgement(false)
   }, [safe])
 
-  const shouldShowBanner = useDebounce(
-    isMigrationBannerEnabled && !isMigrationBannerDismissed && !!wallet,
-    BANNER_DELAY,
-  )
+  console.log(isMigrationBannerEnabled)
+
+  const shouldShowBanner = useDebounce(isMigrationBannerEnabled && !isMigrationBannerDismissed, BANNER_DELAY)
 
   const dismissBanner = useCallback(() => {
     dismissMigrationBanner(safe.chainId)
