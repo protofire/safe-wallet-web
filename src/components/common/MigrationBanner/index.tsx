@@ -51,8 +51,6 @@ export const MigrationBanner = ({ children }: { children?: ReactElement }): Reac
     setAcknowledgement(false)
   }, [safe])
 
-  console.log(isMigrationBannerEnabled)
-
   const shouldShowBanner = useDebounce(isMigrationBannerEnabled && !isMigrationBannerDismissed, BANNER_DELAY)
 
   const dismissBanner = useCallback(() => {
