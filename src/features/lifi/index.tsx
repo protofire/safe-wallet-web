@@ -39,7 +39,7 @@ const LifiSwapWidget = ({ sell }: Params) => {
 
   const INITIAL_PARAMS: WidgetConfig = {
     integrator: 'protofire-safe',
-    fee: 0.05,
+    fee: 0.005,
     variant: 'compact',
     subvariant: 'split',
     subvariantOptions: {
