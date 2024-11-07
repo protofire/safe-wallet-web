@@ -24,6 +24,7 @@ import { OVERVIEW_EVENTS, OVERVIEW_LABELS } from '@/services/analytics'
 import { useSafeTokenEnabled } from '@/hooks/useSafeTokenEnabled'
 import useChainId from '@/hooks/useChainId'
 import ChainLogo from '@/components/common/ChainLogo'
+import { MigrationBanner } from '../MigrationBanner'
 
 type HeaderProps = {
   onMenuToggle?: Dispatch<SetStateAction<boolean>>
@@ -92,6 +93,10 @@ const Header = ({ onMenuToggle, onBatchToggle }: HeaderProps): ReactElement => {
 
       <div className={css.element}>
         <NotificationCenter />
+      </div>
+
+      <div className={css.element}>
+        <MigrationBanner />
       </div>
 
       {safeAddress && (
