@@ -9,7 +9,7 @@ import { AppRoutes } from '@/config/routes'
 import packageJson from '../../../../package.json'
 import ExternalLink from '../ExternalLink'
 import MUILink from '@mui/material/Link'
-import { HELP_CENTER_URL, IS_DEV, IS_OFFICIAL_HOST } from '@/config/constants'
+import { HELP_CENTER_URL } from '@/config/constants'
 import darkPalette from '@/components/theme/darkPalette'
 import ProtofireLogo from '@/public/images/protofire-logo.svg'
 
@@ -47,15 +47,14 @@ const Footer = (): ReactElement | null => {
   return (
     <footer className={css.container}>
       <ul>
-        {IS_OFFICIAL_HOST || IS_DEV ? (
-          <>
-            {/* <li>
+        <>
+          {/* <li>
               <Typography variant="caption">&copy;2022–{new Date().getFullYear()} Core Contributors GmbH</Typography>
             </li> */}
-            <li>
-              <FooterLink href={getHref(AppRoutes.terms)}>Terms</FooterLink>
-            </li>
-            {/* <li>
+          <li>
+            <FooterLink href={getHref(AppRoutes.terms)}>Terms</FooterLink>
+          </li>
+          {/* <li>
               <FooterLink href={getHref(AppRoutes.privacy)}>Privacy</FooterLink>
             </li>
             <li>
@@ -64,21 +63,18 @@ const Footer = (): ReactElement | null => {
             <li>
               <FooterLink href={getHref(AppRoutes.imprint)}>Imprint</FooterLink>
             </li> */}
-            <li>
-              <FooterLink href={getHref(AppRoutes.cookie)}>Cookie policy</FooterLink>
-            </li>
-            <li>
-              <FooterLink href={getHref(AppRoutes.settings.index)}>Preferences</FooterLink>
-            </li>
-            <li>
-              <ExternalLink href={HELP_CENTER_URL} noIcon sx={{ span: { textDecoration: 'underline' } }}>
-                Help
-              </ExternalLink>
-            </li>
-          </>
-        ) : (
-          <li>{'This is an unofficial distribution of Safe{Wallet}'}</li>
-        )}
+          <li>
+            <FooterLink href={getHref(AppRoutes.cookie)}>Cookie policy</FooterLink>
+          </li>
+          <li>
+            <FooterLink href={getHref(AppRoutes.settings.index)}>Preferences</FooterLink>
+          </li>
+          <li>
+            <ExternalLink href={HELP_CENTER_URL} noIcon sx={{ span: { textDecoration: 'underline' } }}>
+              Help
+            </ExternalLink>
+          </li>
+        </>
 
         <li>
           <ExternalLink href="https://protofire.io/" noIcon>

@@ -1,6 +1,6 @@
 import { useDarkMode } from '@/hooks/useDarkMode'
 import { useCurrentChain } from '@/hooks/useChains'
-import Image from 'next/image'
+import ImageFallback from '../ImageFallback'
 
 export default function ChainLogo() {
   const chain = useCurrentChain()
@@ -9,5 +9,5 @@ export default function ChainLogo() {
     ? `/images/chains-logo/${chain?.chainId}-dark.svg`
     : `/images/chains-logo/${chain?.chainId}-light.svg`
 
-  return <Image src={src} alt="Chain logo" width={130} height={30} />
+  return <ImageFallback src={src} fallbackSrc="/images/logo-text.svg" alt="Chain logo" width={130} height={30} />
 }
