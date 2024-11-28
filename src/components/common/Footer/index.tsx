@@ -77,11 +77,6 @@ const Footer = (): ReactElement | null => {
         </>
 
         <li>
-          <ExternalLink href="https://protofire.io/" noIcon>
-            <SvgIcon component={FileOpenIcon} inheritViewBox fontSize="inherit" sx={{ mr: 0.5 }} /> Protofire
-          </ExternalLink>
-        </li>
-        <li>
           <ExternalLink href={`${packageJson.homepage}/releases/tag/v${packageJson.version}`} noIcon>
             <SvgIcon component={GitHubIcon} inheritViewBox fontSize="inherit" sx={{ mr: 0.5 }} /> v{packageJson.version}
           </ExternalLink>
