@@ -47,6 +47,9 @@ const Footer = (): ReactElement | null => {
     <footer className={css.container}>
       <ul>
         <>
+          <li>
+            This is a Safe{'{'}Wallet{'}'} Partner website
+          </li>
           {/* <li>
               <Typography variant="caption">&copy;2022–{new Date().getFullYear()} Core Contributors GmbH</Typography>
             </li> */}
