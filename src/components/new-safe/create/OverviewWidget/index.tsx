@@ -31,7 +31,7 @@ const OverviewWidget = ({ safeName, networks }: { safeName: string; networks: Ch
     <Grid item xs={12}>
       <Card className={css.card}>
         <div className={css.header}>
-          <SafeLogo alt="Safe logo" width={'300px'} height={'70px'} background-color={grey} />
+          <SafeLogo alt="Safe logo" width="300px" height="70px" background-color={grey} />
           <Typography variant="h4">Your Safe Account preview</Typography>
         </div>
         {wallet ? (
