@@ -2,14 +2,15 @@ import WalletOverview from 'src/components/common/WalletOverview'
 import useWallet from '@/hooks/wallets/useWallet'
 import { Box, Card, Grid, Typography } from '@mui/material'
 import type { ReactElement } from 'react'
-import SafeLogo from '@/public/images/logo-no-text.svg'
+import SafeLogo from '@/public/images/welcome/logo_text_protofire_safe.svg'
 
 import css from '@/components/new-safe/create/OverviewWidget/styles.module.css'
 import ConnectWalletButton from '@/components/common/ConnectWallet/ConnectWalletButton'
 import type { ChainInfo } from '@safe-global/safe-gateway-typescript-sdk'
 import NetworkLogosList from '@/features/multichain/components/NetworkLogosList'
+import { grey } from '@mui/material/colors'
 
-const LOGO_DIMENSIONS = '22px'
+const LOGO_DIMENSIONS = '50px'
 
 const OverviewWidget = ({ safeName, networks }: { safeName: string; networks: ChainInfo[] }): ReactElement | null => {
   const wallet = useWallet()
@@ -30,7 +31,7 @@ const OverviewWidget = ({ safeName, networks }: { safeName: string; networks: Ch
     <Grid item xs={12}>
       <Card className={css.card}>
         <div className={css.header}>
-          <SafeLogo alt="Safe logo" width={LOGO_DIMENSIONS} height={LOGO_DIMENSIONS} />
+          <SafeLogo alt="Safe logo" width={'300px'} height={'70px'} background-color={grey} />
           <Typography variant="h4">Your Safe Account preview</Typography>
         </div>
         {wallet ? (
