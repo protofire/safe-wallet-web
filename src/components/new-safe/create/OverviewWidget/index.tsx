@@ -11,7 +11,7 @@ import NetworkLogosList from '@/features/multichain/components/NetworkLogosList'
 import ChainLogo from '@/components/common/ChainLogo'
 import classnames from 'classnames'
 import { AppRoutes } from '@/config/routes'
-import { Url } from 'next/dist/shared/lib/router/router'
+import type { Url } from 'next/dist/shared/lib/router/router'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
 

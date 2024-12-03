@@ -23,7 +23,6 @@ import Track from '@/components/common/Track'
 import { OVERVIEW_EVENTS, OVERVIEW_LABELS } from '@/services/analytics'
 import { useSafeTokenEnabled } from '@/hooks/useSafeTokenEnabled'
 import useChainId from '@/hooks/useChainId'
-import ChainLogo from '@/components/common/ChainLogo'
 import { MigrationBanner } from '../MigrationBanner'
 
 type HeaderProps = {
