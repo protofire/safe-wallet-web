@@ -15,7 +15,6 @@ import type { Url } from 'next/dist/shared/lib/router/router'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
 
-const LOGO_DIMENSIONS = '50px'
 function getLogoLink(router: ReturnType<typeof useRouter>): Url {
   return router.pathname === AppRoutes.home || !router.query.safe
     ? router.pathname === AppRoutes.welcome.accounts
