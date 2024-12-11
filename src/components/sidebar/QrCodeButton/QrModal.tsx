@@ -31,7 +31,7 @@ const QrModal = ({ onClose }: { onClose: () => void }): ReactElement => {
         </Typography>
 
         <Box display="flex" flexDirection="column" flexWrap="wrap" justifyContent="center" alignItems="center" my={2}>
-          <Box mt={1} mb={1} p={1} border="1px solid" borderColor="border.main" borderRadius={1}>
+          <Box mt={1} mb={1} mx="auto" p={1} border="1px solid" borderColor="border.main" borderRadius={1}>
             <QRCode value={qrCode} size={164} />
           </Box>
 
