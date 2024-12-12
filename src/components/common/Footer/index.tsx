@@ -9,7 +9,6 @@ import packageJson from '../../../../package.json'
 import ExternalLink from '../ExternalLink'
 import MUILink from '@mui/material/Link'
 import { HELP_CENTER_URL } from '@/config/constants'
-import darkPalette from '@/components/theme/darkPalette'
 import ProtofireLogo from '@/public/images/protofire-logo.svg'
 
 const footerPages = [
@@ -95,9 +94,9 @@ const Footer = (): ReactElement | null => {
               fontSize="small"
               sx={{ verticalAlign: 'middle', mx: 0.5 }}
             />
-            <MUILink href="https://protofire.io" sx={{ color: darkPalette.primary.main, textDecoration: 'none' }}>
+            <ExternalLink href="https://protofire.io" sx={{ textDecoration: 'none' }} noIcon>
               Protofire
-            </MUILink>
+            </ExternalLink>
           </Typography>
         </li>
       </ul>
