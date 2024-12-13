@@ -19,9 +19,9 @@ import { HELP_CENTER_URL, IS_PRODUCTION, NEW_SUGGESTION_FORM } from '@/config/co
 import Track from '@/components/common/Track'
 import { OVERVIEW_EVENTS } from '@/services/analytics/events/overview'
 import { useCurrentChain } from '@/hooks/useChains'
-import ExternalLink from '@/components/common/ExternalLink'
 import ProtofireLogo from '@/public/images/protofire-logo.svg'
 import SuggestionIcon from '@/public/images/sidebar/lightbulb_icon.svg'
+import ExternalLink from '@/components/common/ExternalLink'
 
 const SidebarFooter = (): ReactElement => {
   const dispatch = useAppDispatch()
