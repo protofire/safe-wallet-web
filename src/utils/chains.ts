@@ -44,6 +44,7 @@ export enum FEATURES {
 export const FeatureRoutes = {
   [AppRoutes.apps.index]: FEATURES.SAFE_APPS,
   [AppRoutes.swap]: FEATURES.NATIVE_SWAPS,
+  [AppRoutes.lifi]: FEATURES.NATIVE_SWAPS_LIFI,
   [AppRoutes.stake]: FEATURES.STAKING,
   [AppRoutes.balances.nfts]: FEATURES.ERC721,
   [AppRoutes.settings.notifications]: FEATURES.PUSH_NOTIFICATIONS,
