@@ -11,7 +11,7 @@ import NetworkSelector from '@/components/common/NetworkSelector'
 import SafeTokenWidget from '@/components/common/SafeTokenWidget'
 import NotificationCenter from '@/components/notification-center/NotificationCenter'
 import { AppRoutes } from '@/config/routes'
-import SafeLogo from '@/public/images/welcome/logo_text_protofire_safe.svg'
+import SafeLogo from '@/public/images/logo.svg'
 import SafeLogoMobile from '@/public/images/logo-no-text.svg'
 import Link from 'next/link'
 import useSafeAddress from '@/hooks/useSafeAddress'
@@ -23,6 +23,7 @@ import Track from '@/components/common/Track'
 import { OVERVIEW_EVENTS, OVERVIEW_LABELS } from '@/services/analytics'
 import { useSafeTokenEnabled } from '@/hooks/useSafeTokenEnabled'
 import useChainId from '@/hooks/useChainId'
+import ChainLogo from '@/components/common/ChainLogo'
 import { MigrationBanner } from '../MigrationBanner'
 
 type HeaderProps = {
@@ -80,7 +81,7 @@ const Header = ({ onMenuToggle, onBatchToggle }: HeaderProps): ReactElement => {
 
       <div className={classnames(css.element, css.hideMobile, css.logo)}>
         <Link href={logoHref} passHref>
-          <SafeLogo alt="Safe logo" width={350} />
+          {chainId ? <ChainLogo /> : <SafeLogo alt="Safe logo" />}
         </Link>
       </div>
 
