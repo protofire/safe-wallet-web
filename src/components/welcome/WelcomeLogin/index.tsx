@@ -1,5 +1,5 @@
 import { AppRoutes } from '@/config/routes'
-import { Paper, Typography, Divider, Box, Button, Link } from '@mui/material'
+import { Paper, Typography, Divider, Box, Button, Link, SvgIcon } from '@mui/material'
 import css from './styles.module.css'
 import { useRouter } from 'next/router'
 import { CREATE_SAFE_EVENTS } from '@/services/analytics/events/createLoadSafe'
@@ -9,6 +9,7 @@ import { useHasSafes } from '../MyAccounts/useAllSafes'
 import Track from '@/components/common/Track'
 import { useCallback, useEffect, useState } from 'react'
 import WalletLogin from './WalletLogin'
+import SafeLogo from '@/public/images/logo-text.svg'
 
 const WelcomeLogin = () => {
   const router = useRouter()
@@ -39,11 +40,11 @@ const WelcomeLogin = () => {
   return (
     <Paper className={css.loginCard} data-testid="welcome-login">
       <Box className={css.loginContent}>
-        {/* <SvgIcon
+        <SvgIcon
           component={SafeLogo}
           inheritViewBox
           sx={{ height: '3em', width: '10em', ml: '-8px', overflow: 'hidden', borderRadius: '8px' }}
-        /> */}
+        />
 
         <Typography variant="h6" mt={3} fontWeight={700}>
           Get started

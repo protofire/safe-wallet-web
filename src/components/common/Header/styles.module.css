@@ -42,10 +42,13 @@
 
 .logo svg,
 .logoMobile svg {
+  align-items: flex-start;
+  flex-direction: row;
+  align-items: center;
+  position: relative;
   width: auto;
-  display: block;
-  color: var(--color-logo-main);
-  height: 20px;
+  display: flex;
+  height: 35px;
 }
 
 .logo {
