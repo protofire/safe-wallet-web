@@ -1,6 +1,5 @@
 import { AppRoutes } from '@/config/routes'
-import { Paper, SvgIcon, Typography, Divider, Box, Button, Link } from '@mui/material'
-import SafeLogo from '@/public/images/logo-text.svg'
+import { Paper, Typography, Divider, Box, Button, Link, SvgIcon } from '@mui/material'
 import css from './styles.module.css'
 import { useRouter } from 'next/router'
 import { CREATE_SAFE_EVENTS } from '@/services/analytics/events/createLoadSafe'
@@ -10,6 +9,7 @@ import { useHasSafes } from '../MyAccounts/useAllSafes'
 import Track from '@/components/common/Track'
 import { useCallback, useEffect, useState } from 'react'
 import WalletLogin from './WalletLogin'
+import SafeLogo from '@/public/images/logo-text.svg'
 
 const WelcomeLogin = () => {
   const router = useRouter()

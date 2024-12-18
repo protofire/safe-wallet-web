@@ -24,6 +24,7 @@ import { OVERVIEW_EVENTS, OVERVIEW_LABELS } from '@/services/analytics'
 import { useSafeTokenEnabled } from '@/hooks/useSafeTokenEnabled'
 import useChainId from '@/hooks/useChainId'
 import { MigrationBanner } from '../MigrationBanner'
+import ProtofireLogo from '@/public/images/protofire-logo.svg'
 
 type HeaderProps = {
   onMenuToggle?: Dispatch<SetStateAction<boolean>>
@@ -81,9 +82,15 @@ const Header = ({ onMenuToggle, onBatchToggle }: HeaderProps): ReactElement => {
       <div className={classnames(css.element, css.hideMobile, css.logo)}>
         <Link href={logoHref} passHref>
           <SvgIcon
+            component={ProtofireLogo}
+            inheritViewBox
+            fontSize="small"
+            sx={{ verticalAlign: 'middle', mx: 0.5 }}
+          />
+          <SvgIcon
             component={SafeLogo}
             inheritViewBox
-            sx={{ height: '5em', width: '12em', overflow: 'hidden', borderRadius: '8px' }}
+            sx={{ height: '5em', width: '12em', overflow: 'hidden', borderRadius: '8px', mt: '-1.4em', ml: '0.5em' }}
           />
         </Link>
       </div>
