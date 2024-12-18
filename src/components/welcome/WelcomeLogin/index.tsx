@@ -1,6 +1,5 @@
 import { AppRoutes } from '@/config/routes'
-import { Paper, SvgIcon, Typography, Divider, Box, Button, Link } from '@mui/material'
-import SafeLogo from '@/public/images/logo.svg'
+import { Paper, Typography, Divider, Box, Button, Link } from '@mui/material'
 import css from './styles.module.css'
 import { useRouter } from 'next/router'
 import { CREATE_SAFE_EVENTS } from '@/services/analytics/events/createLoadSafe'
