@@ -40,11 +40,11 @@ const WelcomeLogin = () => {
   return (
     <Paper className={css.loginCard} data-testid="welcome-login">
       <Box className={css.loginContent}>
-        <SvgIcon
+        {/* <SvgIcon
           component={SafeLogo}
           inheritViewBox
           sx={{ height: '3em', width: '10em', ml: '-8px', overflow: 'hidden', borderRadius: '8px' }}
-        />
+        /> */}
 
         <Typography variant="h6" mt={3} fontWeight={700}>
           Get started
