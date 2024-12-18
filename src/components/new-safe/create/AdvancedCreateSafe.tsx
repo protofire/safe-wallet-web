@@ -125,7 +125,6 @@ const AdvancedCreateSafe = () => {
 
         <Grid item xs={12} md={4} mb={[3, null, 0]} order={[0, null, 1]}>
           <Grid container spacing={3}>
-            {activeStep < 2 && <OverviewWidget safeName={safeName} networks={[]} />}
             {wallet?.address && <CreateSafeInfos dynamicHint={dynamicHint} />}
           </Grid>
         </Grid>
