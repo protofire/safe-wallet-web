@@ -22,6 +22,7 @@ import { useCurrentChain } from '@/hooks/useChains'
 import ProtofireLogo from '@/public/images/protofire-logo.svg'
 import SuggestionIcon from '@/public/images/sidebar/lightbulb_icon.svg'
 import ExternalLink from '@/components/common/ExternalLink'
+import SafeLogo from '@/public/images/logo-text.svg'
 
 const SidebarFooter = (): ReactElement => {
   const dispatch = useAppDispatch()
@@ -43,6 +44,13 @@ const SidebarFooter = (): ReactElement => {
 
   return (
     <SidebarList>
+      <ListItem disablePadding>
+        <SvgIcon
+          component={SafeLogo}
+          inheritViewBox
+          sx={{ height: '3.5em', verticalAlign: 'middle', width: '100%', mb: '-12%' }}
+        />
+      </ListItem>
       {!IS_PRODUCTION && (
         <ListItem disablePadding>
           <DebugToggle />
