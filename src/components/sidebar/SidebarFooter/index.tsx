@@ -44,21 +44,14 @@ const SidebarFooter = (): ReactElement => {
 
   return (
     <SidebarList>
-      <ListItem disablePadding>
-        <SvgIcon
-          component={SafeLogo}
-          inheritViewBox
-          sx={{ height: '3.5em', verticalAlign: 'middle', width: '100%', mb: '-12%' }}
-        />
-      </ListItem>
       {!IS_PRODUCTION && (
-        <ListItem disablePadding>
+        <ListItem disablePadding style={{ marginTop: '-3%' }}>
           <DebugToggle />
         </ListItem>
       )}
 
       <Track {...OVERVIEW_EVENTS.WHATS_NEW}>
-        <ListItem disablePadding>
+        <ListItem disablePadding style={{ marginTop: '-7%' }}>
           <SidebarListItemButton id={BEAMER_SELECTOR} onClick={handleBeamer}>
             <SidebarListItemIcon color="primary">
               <BeamerIcon />
@@ -96,6 +89,13 @@ const SidebarFooter = (): ReactElement => {
           </a>
         </ListItem>
       </Track>
+      <ListItem disablePadding style={{ marginTop: '-5%' }}>
+        <SvgIcon
+          component={SafeLogo}
+          inheritViewBox
+          sx={{ height: '3.5em', verticalAlign: 'middle', width: '100%', mb: '-12%' }}
+        />
+      </ListItem>
       <ListItem>
         <SidebarListItemText>
           <Typography variant="caption">
