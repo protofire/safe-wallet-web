@@ -33,13 +33,15 @@ import { PUSH_NOTIFICATION_EVENTS } from '@/services/analytics/events/push-notif
 import { requestNotificationPermission } from './logic'
 import type { NotifiableSafes } from './logic'
 import type { PushNotificationPreferences } from '@/services/push-notifications/preferences'
-import CheckWallet from '@/components/common/CheckWallet'
+import CheckWalletWithPermission from '@/components/common/CheckWalletWithPermission'
+import { Permission } from '@/permissions/types'
 
 import css from './styles.module.css'
 import useAllOwnedSafes from '@/features/myAccounts/hooks/useAllOwnedSafes'
 import useWallet from '@/hooks/wallets/useWallet'
 import { selectAllAddedSafes, type AddedSafesState } from '@/store/addedSafesSlice'
 import { maybePlural } from '@/utils/formatters'
+import { useNotificationsRenewal } from './hooks/useNotificationsRenewal'
 
 // UI logic
 
@@ -268,6 +270,8 @@ export const GlobalPushNotifications = (): ReactElement | null => {
   const { unregisterDeviceNotifications, unregisterSafeNotifications, registerNotifications } =
     useNotificationRegistrations()
 
+  const { safesForRenewal } = useNotificationsRenewal()
+
   // Safes selected in the UI
   const [selectedSafes, setSelectedSafes] = useState<NotifiableSafes>({})
 
@@ -349,7 +353,11 @@ export const GlobalPushNotifications = (): ReactElement | null => {
 
     const registrationPromises: Array<Promise<unknown>> = []
 
-    const safesToRegister = _getSafesToRegister(selectedSafes, currentNotifiedSafes)
+    const newlySelectedSafes = _getSafesToRegister(selectedSafes, currentNotifiedSafes)
+
+    // Merge Safes that need to be registered with the ones for which notifications need to be renewed
+    const safesToRegister = _mergeNotifiableSafes(newlySelectedSafes, {}, safesForRenewal)
+
     if (safesToRegister) {
       registrationPromises.push(registerNotifications(safesToRegister))
     }
@@ -396,13 +404,13 @@ export const GlobalPushNotifications = (): ReactElement | null => {
             </Typography>
           )}
 
-          <CheckWallet allowNonOwner>
+          <CheckWalletWithPermission permission={Permission.EnablePushNotifications}>
             {(isOk) => (
               <Button variant="contained" disabled={!canSave || !isOk || isLoading} onClick={onSave}>
                 {isLoading ? <CircularProgress size={20} /> : 'Save'}
               </Button>
             )}
-          </CheckWallet>
+          </CheckWalletWithPermission>
         </Box>
       </Grid>
 
