@@ -169,8 +169,8 @@ const CreateSafe = () => {
 
   const initialStep = 0
   const initialData: NewSafeFormData = {
-    name: '',
-    networks: [],
+    name: safeName,
+    networks: overviewNetworks || [],
     owners: [],
     threshold: 1,
     safeVersion: getLatestSafeVersion(chain) as SafeVersion,

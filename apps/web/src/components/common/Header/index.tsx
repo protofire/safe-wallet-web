@@ -24,8 +24,7 @@ import { useHasFeature } from '@/hooks/useChains'
 import Track from '@/components/common/Track'
 import { OVERVIEW_EVENTS, OVERVIEW_LABELS } from '@/services/analytics'
 import { useSafeTokenEnabled } from '@/hooks/useSafeTokenEnabled'
-import useChainId from '@/hooks/useChainId'
-import { MigrationBanner } from '../MigrationBanner'
+//import useChainId from '@/hooks/useChainId'
 import ProtofireLogo from '@/public/images/protofire-logo.svg'
 
 type HeaderProps = {
@@ -42,14 +41,13 @@ function getLogoLink(router: ReturnType<typeof useRouter>): Url {
 }
 
 const Header = ({ onMenuToggle, onBatchToggle }: HeaderProps): ReactElement => {
-  const chainId = useChainId()
+  //const chainId = useChainId()
   const safeAddress = useSafeAddress()
   const showSafeToken = useSafeTokenEnabled()
-  const isProposer = useIsWalletProposer()
-  const isSafeOwner = useIsSafeOwner()
+  // const isProposer = useIsWalletProposer()
+  // const isSafeOwner = useIsSafeOwner()
   const router = useRouter()
   const enableWc = useHasFeature(FEATURES.NATIVE_WALLETCONNECT)
-  const isOfficialHost = useIsOfficialHost()
 
   // If on the home page, the logo should link to the Accounts or Welcome page, otherwise to the home page
   const logoHref = getLogoLink(router)
@@ -68,7 +66,7 @@ const Header = ({ onMenuToggle, onBatchToggle }: HeaderProps): ReactElement => {
     }
   }
 
-  const showBatchButton = safeAddress && (!isProposer || isSafeOwner)
+  //const showBatchButton = safeAddress && (!isProposer || isSafeOwner)
 
   return (
     <Paper className={css.container}>
@@ -82,7 +80,7 @@ const Header = ({ onMenuToggle, onBatchToggle }: HeaderProps): ReactElement => {
 
       <div className={classnames(css.element, css.logoMobile)}>
         <Link href={logoHref} passHref>
-          {isOfficialHost ? <SafeLogoMobile alt="Safe logo" /> : null}
+          <SafeLogoMobile alt="Safe logo" />
         </Link>
       </div>
 
@@ -112,9 +110,9 @@ const Header = ({ onMenuToggle, onBatchToggle }: HeaderProps): ReactElement => {
         <NotificationCenter />
       </div>
 
-      <div className={css.element}>
+      {/* <div className={css.element}>
         <MigrationBanner />
-      </div>
+      </div> */}
 
       {safeAddress && (
         <div className={classnames(css.element, css.hideMobile)}>

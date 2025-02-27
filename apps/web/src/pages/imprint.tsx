@@ -30,7 +30,6 @@ const SafeImprint = () => {
 }
 
 const Imprint: NextPage = () => {
-
   return (
     <>
       <Head>

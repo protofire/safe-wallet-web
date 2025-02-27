@@ -90,9 +90,9 @@ const AdvancedCreateSafe = () => {
     },
   ]
 
-  const initialStep = 0
+  const initialStep = activeStep
   const initialData: NewSafeFormData = {
-    name: '',
+    name: safeName,
     networks: [],
     owners: [],
     threshold: 1,

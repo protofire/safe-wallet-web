@@ -22,7 +22,7 @@ import { useHasFeature } from '@/hooks/useChains'
 import Track from '@/components/common/Track'
 import { OVERVIEW_EVENTS, OVERVIEW_LABELS } from '@/services/analytics'
 import { useSafeTokenEnabled } from '@/hooks/useSafeTokenEnabled'
-import useChainId from '@/hooks/useChainId'
+//import useChainId from '@/hooks/useChainId'
 
 type HeaderProps = {
   onMenuToggle?: Dispatch<SetStateAction<boolean>>
@@ -38,7 +38,7 @@ function getLogoLink(router: ReturnType<typeof useRouter>): Url {
 }
 
 const Header = ({ onMenuToggle, onBatchToggle }: HeaderProps): ReactElement => {
-  const chainId = useChainId()
+  //const chainId = useChainId()
   const safeAddress = useSafeAddress()
   const showSafeToken = useSafeTokenEnabled()
   const router = useRouter()

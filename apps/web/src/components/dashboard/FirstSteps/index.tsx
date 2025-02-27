@@ -1,11 +1,11 @@
 import { BuyCryptoOptions } from '@/components/common/BuyCryptoButton'
-import CheckWallet from '@/components/common/CheckWallet'
+//import CheckWallet from '@/components/common/CheckWallet'
 import EthHashInfo from '@/components/common/EthHashInfo'
 import ExternalLink from '@/components/common/ExternalLink'
 import ModalDialog from '@/components/common/ModalDialog'
 import QRCode from '@/components/common/QRCode'
 import Track from '@/components/common/Track'
-import FirstTxFlow from '@/features/counterfactual/FirstTxFlow'
+//import FirstTxFlow from '@/features/counterfactual/FirstTxFlow'
 import { selectUndeployedSafe } from '@/features/counterfactual/store/undeployedSafesSlice'
 import useBalances from '@/hooks/useBalances'
 import { useCurrentChain } from '@/hooks/useChains'
@@ -15,7 +15,7 @@ import { useAppDispatch, useAppSelector } from '@/store'
 import { selectSettings, setQrShortName } from '@/store/settingsSlice'
 import { selectOutgoingTransactions } from '@/store/txHistorySlice'
 import { getExplorerLink } from '@/utils/gateway'
-import type { ChainInfo } from '@safe-global/safe-gateway-typescript-sdk'
+//import type { ChainInfo } from '@safe-global/safe-gateway-typescript-sdk'
 import classnames from 'classnames'
 import { type ReactNode, useState } from 'react'
 import { Card, WidgetBody, WidgetContainer } from '@/components/dashboard/styled'
@@ -24,8 +24,8 @@ import CircleOutlinedIcon from '@mui/icons-material/CircleOutlined'
 import CheckCircleRoundedIcon from '@mui/icons-material/CheckCircleRounded'
 import CheckCircleOutlineRoundedIcon from '@mui/icons-material/CheckCircleOutlineRounded'
 import css from './styles.module.css'
-import ActivateAccountButton from '@/features/counterfactual/ActivateAccountButton'
-import { isReplayedSafeProps } from '@/features/counterfactual/utils'
+// import ActivateAccountButton from '@/features/counterfactual/ActivateAccountButton'
+// import { isReplayedSafeProps } from '@/features/counterfactual/utils'
 
 const calculateProgress = (items: boolean[]) => {
   const totalNumberOfItems = items.length
@@ -264,78 +264,78 @@ const AddFundsWidget = ({ completed }: { completed: boolean }) => {
   )
 }
 
-const FirstTransactionWidget = ({ completed }: { completed: boolean }) => {
-  const [open, setOpen] = useState<boolean>(false)
+// const FirstTransactionWidget = ({ completed }: { completed: boolean }) => {
+//   const [open, setOpen] = useState<boolean>(false)
 
-  const title = 'Create your first transaction'
-  const content = 'Simply send funds, add a new signer or swap tokens through a safe app.'
+//   const title = 'Create your first transaction'
+//   const content = 'Simply send funds, add a new signer or swap tokens through a safe app.'
 
-  return (
-    <>
-      <StatusCard
-        badge={
-          <Typography variant="body2" className={css.badgeText}>
-            First interaction
-          </Typography>
-        }
-        title={title}
-        content={content}
-        completed={completed}
-      >
-        {!completed && (
-          <CheckWallet>
-            {(isOk) => (
-              <Track {...OVERVIEW_EVENTS.NEW_TRANSACTION} label="onboarding">
-                <Button
-                  data-testid="create-tx-btn"
-                  onClick={() => setOpen(true)}
-                  variant="outlined"
-                  size="small"
-                  sx={{ mt: 2, minHeight: '40px' }}
-                  disabled={!isOk}
-                >
-                  Create transaction
-                </Button>
-              </Track>
-            )}
-          </CheckWallet>
-        )}
-      </StatusCard>
-      <FirstTxFlow open={open} onClose={() => setOpen(false)} />
-    </>
-  )
-}
+//   return (
+//     <>
+//       <StatusCard
+//         badge={
+//           <Typography variant="body2" className={css.badgeText}>
+//             First interaction
+//           </Typography>
+//         }
+//         title={title}
+//         content={content}
+//         completed={completed}
+//       >
+//         {!completed && (
+//           <CheckWallet>
+//             {(isOk) => (
+//               <Track {...OVERVIEW_EVENTS.NEW_TRANSACTION} label="onboarding">
+//                 <Button
+//                   data-testid="create-tx-btn"
+//                   onClick={() => setOpen(true)}
+//                   variant="outlined"
+//                   size="small"
+//                   sx={{ mt: 2, minHeight: '40px' }}
+//                   disabled={!isOk}
+//                 >
+//                   Create transaction
+//                 </Button>
+//               </Track>
+//             )}
+//           </CheckWallet>
+//         )}
+//       </StatusCard>
+//       <FirstTxFlow open={open} onClose={() => setOpen(false)} />
+//     </>
+//   )
+// }
 
-const ActivateSafeWidget = ({ chain }: { chain: ChainInfo | undefined }) => {
-  const [open, setOpen] = useState<boolean>(false)
+// const ActivateSafeWidget = ({ chain }: { chain: ChainInfo | undefined }) => {
+//   const [open, setOpen] = useState<boolean>(false)
 
-  const title = `Activate account ${chain ? 'on ' + chain.chainName : ''}`
-  const content = 'Activate your account to start using all benefits of Safe'
+//   const title = `Activate account ${chain ? 'on ' + chain.chainName : ''}`
+//   const content = 'Activate your account to start using all benefits of Safe'
 
-  return (
-    <>
-      <StatusCard
-        badge={
-          <Typography variant="body2" className={css.badgeText}>
-            First interaction
-          </Typography>
-        }
-        title={title}
-        completed={false}
-        content={content}
-      >
-        <Box
-          sx={{
-            mt: 2,
-          }}
-        >
-          <ActivateAccountButton />
-        </Box>
-      </StatusCard>
-      <FirstTxFlow open={open} onClose={() => setOpen(false)} />
-    </>
-  )
-}
+//   return (
+//     <>
+//       <StatusCard
+//         badge={
+//           <Typography variant="body2" className={css.badgeText}>
+//             First interaction
+//           </Typography>
+//         }
+//         title={title}
+//         completed={false}
+//         content={content}
+//       >
+//         <Box
+//           sx={{
+//             mt: 2,
+//           }}
+//         >
+//           <ActivateAccountButton />
+//         </Box>
+//       </StatusCard>
+//       <FirstTxFlow open={open} onClose={() => setOpen(false)} />
+//     </>
+//   )
+// }
 
 const AccountReadyWidget = () => {
   return (
@@ -365,11 +365,12 @@ const FirstSteps = () => {
   const chain = useCurrentChain()
   const undeployedSafe = useAppSelector((state) => selectUndeployedSafe(state, safe.chainId, safeAddress))
 
-  const isMultiSig = safe.threshold > 1
-  const isReplayedSafe = undeployedSafe && isReplayedSafeProps(undeployedSafe?.props)
+  // const isMultiSig = safe.threshold > 1
+  // const isReplayedSafe = undeployedSafe && isReplayedSafeProps(undeployedSafe?.props)
 
   const hasNonZeroBalance = balances && (balances.items.length > 1 || BigInt(balances.items[0]?.balance || 0) > 0)
-  const hasOutgoingTransactions = !!outgoingTransactions && outgoingTransactions.length > 0
+  const hasOutgoingTransactions =
+    !!outgoingTransactions && Array.isArray(outgoingTransactions) && outgoingTransactions.length > 0
   const completedItems = [hasNonZeroBalance, hasOutgoingTransactions]
 
   const progress = calculateProgress(completedItems)
