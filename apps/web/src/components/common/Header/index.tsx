@@ -1,5 +1,5 @@
-import useIsSafeOwner from '@/hooks/useIsSafeOwner'
-import { useIsWalletProposer } from '@/hooks/useProposers'
+// import useIsSafeOwner from '@/hooks/useIsSafeOwner'
+// import { useIsWalletProposer } from '@/hooks/useProposers'
 import type { Dispatch, SetStateAction } from 'react'
 import { type ReactElement } from 'react'
 import { useRouter } from 'next/router'
