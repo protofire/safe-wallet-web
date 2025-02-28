@@ -6,7 +6,7 @@ index 00ae69d..1472b56 100644
      { chainId: 1729n, shortName: 'reya' },
      { chainId: 1807n, shortName: 'rana' },
      { chainId: 1811n, shortName: 'lif3-testnet' },
-+    { chainId: 1868n, shortName: 'soneium' },
++    { chainId: 146n, shortName: 'sonic' },
      { chainId: 1890n, shortName: 'lightlink_phoenix' },
      { chainId: 1891n, shortName: 'lightlink_pegasus' },
      { chainId: 1984n, shortName: 'euntest' },
