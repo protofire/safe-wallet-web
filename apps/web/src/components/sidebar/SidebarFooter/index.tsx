@@ -15,7 +15,7 @@ import BeamerIcon from '@/public/images/sidebar/whats-new.svg'
 //import HelpCenterIcon from '@/public/images/sidebar/help-center.svg'
 import { ListItem, SvgIcon, Typography } from '@mui/material'
 import DebugToggle from '../DebugToggle'
-import { IS_PRODUCTION, NEW_SUGGESTION_FORM } from '@/config/constants'
+import { IS_PRODUCTION, NEW_SUGGESTION_FORM, HELP_CENTER_SAFE } from '@/config/constants'
 import Track from '@/components/common/Track'
 import { OVERVIEW_EVENTS } from '@/services/analytics/events/overview'
 import { useCurrentChain } from '@/hooks/useChains'
@@ -50,7 +50,7 @@ const SidebarFooter = (): ReactElement => {
         </ListItem>
       )}
 
-      <Track {...OVERVIEW_EVENTS.WHATS_NEW}>
+      {/* <Track {...OVERVIEW_EVENTS.WHATS_NEW}>
         <ListItem disablePadding style={{ marginTop: '-7%' }}>
           <SidebarListItemButton id={BEAMER_SELECTOR} onClick={handleBeamer}>
             <SidebarListItemIcon color="primary">
@@ -61,8 +61,8 @@ const SidebarFooter = (): ReactElement => {
             </SidebarListItemText>
           </SidebarListItemButton>
         </ListItem>
-      </Track>
-      {/* <Track {...OVERVIEW_EVENTS.HELP_CENTER}>
+      </Track> */}
+      <Track {...OVERVIEW_EVENTS.HELP_CENTER}>
         <ListItem disablePadding>
           <a target="_blank" rel="noopener noreferrer" href={HELP_CENTER_URL} style={{ width: '100%' }}>
             <SidebarListItemButton>
@@ -75,7 +75,7 @@ const SidebarFooter = (): ReactElement => {
             </SidebarListItemButton>
           </a>
         </ListItem>
-      </Track> */}
+      </Track>
 
       <Track {...OVERVIEW_EVENTS.SUGGESTIONS}>
         <ListItem disablePadding>
