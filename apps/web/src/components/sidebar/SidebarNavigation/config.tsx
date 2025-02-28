@@ -114,10 +114,10 @@ export const settingsNavItems = [
     label: 'Security',
     href: AppRoutes.settings.security,
   },
-  {
-    label: 'Notifications',
-    href: AppRoutes.settings.notifications,
-  },
+  // {
+  //   label: 'Notifications',
+  //   href: AppRoutes.settings.notifications,
+  // },
   {
     label: 'Modules',
     href: AppRoutes.settings.modules,
