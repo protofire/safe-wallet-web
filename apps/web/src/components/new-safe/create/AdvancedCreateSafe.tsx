@@ -3,6 +3,7 @@ import { Container, Typography, Grid } from '@mui/material'
 import { useRouter } from 'next/router'
 
 import useWallet from '@/hooks/wallets/useWallet'
+import OverviewWidget from '@/components/new-safe/create/OverviewWidget'
 import type { TxStepperProps } from '@/components/new-safe/CardStepper/useCardStepper'
 import SetNameStep from '@/components/new-safe/create/steps/SetNameStep'
 import OwnerPolicyStep from '@/components/new-safe/create/steps/OwnerPolicyStep'
@@ -90,9 +91,9 @@ const AdvancedCreateSafe = () => {
     },
   ]
 
-  const initialStep = activeStep
+  const initialStep = 0
   const initialData: NewSafeFormData = {
-    name: safeName,
+    name: '',
     networks: [],
     owners: [],
     threshold: 1,
@@ -153,6 +154,7 @@ const AdvancedCreateSafe = () => {
           }}
         >
           <Grid container spacing={3}>
+            {activeStep < 2 && <OverviewWidget safeName={safeName} networks={[]} />}
             {wallet?.address && <CreateSafeInfos dynamicHint={dynamicHint} />}
           </Grid>
         </Grid>
