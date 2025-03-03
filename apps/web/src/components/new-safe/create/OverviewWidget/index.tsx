@@ -1,123 +1,56 @@
-import type { Dispatch, SetStateAction } from 'react'
-import { type ReactElement } from 'react'
-import { useRouter } from 'next/router'
-import type { Url } from 'next/dist/shared/lib/router/router'
-import { IconButton, Paper } from '@mui/material'
-import MenuIcon from '@mui/icons-material/Menu'
-import classnames from 'classnames'
-import css from './styles.module.css'
-import ConnectWallet from '@/components/common/ConnectWallet'
-import NetworkSelector from '@/components/common/NetworkSelector'
-import SafeTokenWidget from '@/components/common/SafeTokenWidget'
-import NotificationCenter from '@/components/notification-center/NotificationCenter'
-import { AppRoutes } from '@/config/routes'
-import SafeLogo from '@/public/images/welcome/logo_text_protofire_safe.svg'
-import SafeLogoMobile from '@/public/images/logo-no-text.svg'
-import Link from 'next/link'
-import useSafeAddress from '@/hooks/useSafeAddress'
-import BatchIndicator from '@/components/batch/BatchIndicator'
-import WalletConnect from '@/features/walletconnect/components'
-import { FEATURES } from '@/utils/chains'
-import { useHasFeature } from '@/hooks/useChains'
-import Track from '@/components/common/Track'
-import { OVERVIEW_EVENTS, OVERVIEW_LABELS } from '@/services/analytics'
-import { useSafeTokenEnabled } from '@/hooks/useSafeTokenEnabled'
-//import useChainId from '@/hooks/useChainId'
+import WalletOverview from 'src/components/common/WalletOverview'
+import useWallet from '@/hooks/wallets/useWallet'
+import { Box, Card, Grid, Typography } from '@mui/material'
+import type { ReactElement } from 'react'
+import SafeLogo from '@/public/images/logo-no-text.svg'
 
-type HeaderProps = {
-  onMenuToggle?: Dispatch<SetStateAction<boolean>>
-  onBatchToggle?: Dispatch<SetStateAction<boolean>>
-}
+import css from '@/components/new-safe/create/OverviewWidget/styles.module.css'
+import ConnectWalletButton from '@/components/common/ConnectWallet/ConnectWalletButton'
+import type { ChainInfo } from '@safe-global/safe-gateway-typescript-sdk'
+import NetworkLogosList from '@/features/multichain/components/NetworkLogosList'
 
-function getLogoLink(router: ReturnType<typeof useRouter>): Url {
-  return router.pathname === AppRoutes.home || !router.query.safe
-    ? router.pathname === AppRoutes.welcome.accounts
-      ? AppRoutes.welcome.index
-      : AppRoutes.welcome.accounts
-    : { pathname: AppRoutes.home, query: { safe: router.query.safe } }
-}
+const LOGO_DIMENSIONS = '22px'
 
-const Header = ({ onMenuToggle, onBatchToggle }: HeaderProps): ReactElement => {
-  //const chainId = useChainId()
-  const safeAddress = useSafeAddress()
-  const showSafeToken = useSafeTokenEnabled()
-  const router = useRouter()
-  const enableWc = useHasFeature(FEATURES.NATIVE_WALLETCONNECT)
-
-  // If on the home page, the logo should link to the Accounts or Welcome page, otherwise to the home page
-  const logoHref = getLogoLink(router)
-
-  const handleMenuToggle = () => {
-    if (onMenuToggle) {
-      onMenuToggle((isOpen) => !isOpen)
-    } else {
-      router.push(logoHref)
-    }
-  }
-
-  const handleBatchToggle = () => {
-    if (onBatchToggle) {
-      onBatchToggle((isOpen) => !isOpen)
-    }
-  }
+const OverviewWidget = ({ safeName, networks }: { safeName: string; networks: ChainInfo[] }): ReactElement | null => {
+  const wallet = useWallet()
+  const rows = [
+    ...(wallet ? [{ title: 'Wallet', component: <WalletOverview wallet={wallet} /> }] : []),
+    ...(safeName !== '' ? [{ title: 'Name', component: <Typography>{safeName}</Typography> }] : []),
+    ...(networks.length
+      ? [
+          {
+            title: 'Network(s)',
+            component: <NetworkLogosList networks={networks} />,
+          },
+        ]
+      : []),
+  ]
 
   return (
-    <Paper className={css.container}>
-      <div className={classnames(css.element, css.menuButton)}>
-        {onMenuToggle && (
-          <IconButton onClick={handleMenuToggle} size="large" color="default" aria-label="menu">
-            <MenuIcon />
-          </IconButton>
+    <Grid item xs={12}>
+      <Card className={css.card}>
+        <div className={css.header}>
+          <SafeLogo alt="Safe logo" width={LOGO_DIMENSIONS} height={LOGO_DIMENSIONS} />
+          <Typography variant="h4">Your Safe Account preview</Typography>
+        </div>
+        {wallet ? (
+          rows.map((row) => (
+            <div key={row.title} className={css.row}>
+              <Typography variant="body2">{row.title}</Typography>
+              {row.component}
+            </div>
+          ))
+        ) : (
+          <Box p={2}>
+            <Typography variant="body2" color="border.main" textAlign="center" width={1} mb={1}>
+              Connect your wallet to continue
+            </Typography>
+            <ConnectWalletButton />
+          </Box>
         )}
-      </div>
-
-      <div className={classnames(css.element, css.logoMobile)}>
-        <Link href={logoHref} passHref>
-          <SafeLogoMobile alt="Safe logo" />
-        </Link>
-      </div>
-
-      <div className={classnames(css.element, css.hideMobile, css.logo)}>
-        <Link href={logoHref} passHref>
-          <SafeLogo alt="Safe logo" width={350} />
-        </Link>
-      </div>
-
-      {showSafeToken && (
-        <div className={classnames(css.element, css.hideMobile)}>
-          <SafeTokenWidget />
-        </div>
-      )}
-
-      <div className={css.element}>
-        <NotificationCenter />
-      </div>
-
-      {safeAddress && (
-        <div className={classnames(css.element, css.hideMobile)}>
-          <BatchIndicator onClick={handleBatchToggle} />
-        </div>
-      )}
-
-      {enableWc && (
-        <div className={classnames(css.element, css.hideMobile)}>
-          <WalletConnect />
-        </div>
-      )}
-
-      <div className={classnames(css.element, css.connectWallet)}>
-        <Track label={OVERVIEW_LABELS.top_bar} {...OVERVIEW_EVENTS.OPEN_ONBOARD}>
-          <ConnectWallet />
-        </Track>
-      </div>
-
-      {safeAddress && (
-        <div className={classnames(css.element, css.networkSelector)}>
-          <NetworkSelector offerSafeCreation />
-        </div>
-      )}
-    </Paper>
+      </Card>
+    </Grid>
   )
 }
 
-export default Header
+export default OverviewWidget

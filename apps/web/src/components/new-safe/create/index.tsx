@@ -2,6 +2,7 @@ import { Container, Typography, Grid } from '@mui/material'
 import { useRouter } from 'next/router'
 
 import useWallet from '@/hooks/wallets/useWallet'
+import OverviewWidget from '@/components/new-safe/create/OverviewWidget'
 import type { NamedAddress } from '@/components/new-safe/create/types'
 import type { TxStepperProps } from '@/components/new-safe/CardStepper/useCardStepper'
 import SetNameStep from '@/components/new-safe/create/steps/SetNameStep'
@@ -169,8 +170,8 @@ const CreateSafe = () => {
 
   const initialStep = 0
   const initialData: NewSafeFormData = {
-    name: safeName,
-    networks: overviewNetworks || [],
+    name: '',
+    networks: [],
     owners: [],
     threshold: 1,
     safeVersion: getLatestSafeVersion(chain) as SafeVersion,
@@ -228,6 +229,7 @@ const CreateSafe = () => {
           }}
         >
           <Grid container spacing={3}>
+            {activeStep < 2 && <OverviewWidget safeName={safeName} networks={overviewNetworks || []} />}
             {wallet?.address && <CreateSafeInfos staticHint={staticHint} dynamicHint={dynamicHint} />}
           </Grid>
         </Grid>
