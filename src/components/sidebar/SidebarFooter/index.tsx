@@ -8,13 +8,14 @@ import {
   SidebarListItemText,
 } from '@/components/sidebar/SidebarList'
 import { BEAMER_SELECTOR, loadBeamer } from '@/services/beamer'
-import { useAppSelector } from '@/store'
+import { useAppDispatch, useAppSelector } from '@/store'
 import { CookieAndTermType, hasConsentFor } from '@/store/cookiesAndTermsSlice'
-//import BeamerIcon from '@/public/images/sidebar/whats-new.svg'
+import { openCookieBanner } from '@/store/popupSlice'
+import BeamerIcon from '@/public/images/sidebar/whats-new.svg'
 import HelpCenterIcon from '@/public/images/sidebar/help-center.svg'
 import { ListItem, SvgIcon, Typography } from '@mui/material'
 import DebugToggle from '../DebugToggle'
-import { IS_PRODUCTION, NEW_SUGGESTION_FORM, HELP_CENTER_URL } from '@/config/constants'
+import { HELP_CENTER_URL, IS_PRODUCTION, NEW_SUGGESTION_FORM } from '@/config/constants'
 import Track from '@/components/common/Track'
 import { OVERVIEW_EVENTS } from '@/services/analytics/events/overview'
 import { useCurrentChain } from '@/hooks/useChains'
@@ -24,7 +25,7 @@ import ExternalLink from '@/components/common/ExternalLink'
 import SafeLogo from '@/public/images/logo-text.svg'
 
 const SidebarFooter = (): ReactElement => {
-  //const dispatch = useAppDispatch()
+  const dispatch = useAppDispatch()
   const chain = useCurrentChain()
   const hasBeamerConsent = useAppSelector((state) => hasConsentFor(state, CookieAndTermType.UPDATES))
 
@@ -35,11 +36,11 @@ const SidebarFooter = (): ReactElement => {
     }
   }, [hasBeamerConsent, chain?.shortName])
 
-  // const handleBeamer = () => {
-  //   if (!hasBeamerConsent) {
-  //     dispatch(openCookieBanner({ warningKey: CookieAndTermType.UPDATES }))
-  //   }
-  // }
+  const handleBeamer = () => {
+    if (!hasBeamerConsent) {
+      dispatch(openCookieBanner({ warningKey: CookieAndTermType.UPDATES }))
+    }
+  }
 
   return (
     <SidebarList>
@@ -105,11 +106,7 @@ const SidebarFooter = (): ReactElement => {
               fontSize="small"
               sx={{ verticalAlign: 'middle', mx: 0.5 }}
             />
-            <ExternalLink
-              href="https://protofire.io/services/solution/safe-deployment"
-              sx={{ textDecoration: 'none' }}
-              noIcon
-            >
+            <ExternalLink href="https://protofire.io" sx={{ textDecoration: 'none' }} noIcon>
               Protofire
             </ExternalLink>
           </Typography>

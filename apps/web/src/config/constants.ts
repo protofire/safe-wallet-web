@@ -30,12 +30,14 @@ export const CYPRESS_MNEMONIC = process.env.NEXT_PUBLIC_CYPRESS_MNEMONIC || ''
 
 // Safe Token
 export const SAFE_TOKEN_ADDRESSES: { [chainId: string]: string } = {
-  [chains.eth]: '0x5aFE3855358E112B5647B952709E6165e1c1eEEe',
+  // TODO: enable once approved
+  // [chains.eth]: '0x5aFE3855358E112B5647B952709E6165e1c1eEEe',
   [chains.sep]: '0xd16d9C09d13E9Cf77615771eADC5d51a1Ae92a26',
 }
 
 export const SAFE_LOCKING_ADDRESS: { [chainId: string]: string } = {
-  [chains.eth]: '0x0a7CB434f96f65972D46A5c1A64a9654dC9959b2',
+  // TODO: enable once approved
+  // [chains.eth]: '0x0a7CB434f96f65972D46A5c1A64a9654dC9959b2',
   [chains.sep]: '0xb161ccb96b9b817F9bDf0048F212725128779DE9',
 }
 
@@ -67,26 +69,28 @@ export enum SafeAppsTag {
 }
 
 // Help Center
+export const STATUS_PAGE = 'https://status.safe.global'
 export const HELP_CENTER_URL = 'https://safe-support.protofire.io'
+export const HELP_CENTER_SAFE = 'https://help.safe.global'
 export const HelpCenterArticle = {
-  ADDRESS_BOOK_DATA: `${HELP_CENTER_URL}/en/articles/40811-address-book-export-and-import`,
-  ADVANCED_PARAMS: `${HELP_CENTER_URL}/en/articles/40837-advanced-transaction-parameters`,
-  CANCELLING_TRANSACTIONS: `${HELP_CENTER_URL}/en/articles/40836-why-do-i-need-to-pay-for-cancelling-a-transaction`,
-  COOKIES: `${HELP_CENTER_URL}/en/articles/40797-why-do-i-need-to-enable-third-party-cookies-for-safe-apps`,
-  CONFLICTING_TRANSACTIONS: `${HELP_CENTER_URL}/en/articles/40839-why-are-transactions-with-the-same-nonce-conflicting-with-each-other`,
-  FALLBACK_HANDLER: `${HELP_CENTER_URL}/en/articles/40838-what-is-a-fallback-handler-and-how-does-it-relate-to-safe`,
-  MOBILE_SAFE: `${HELP_CENTER_URL}/en/articles/40801-connect-to-web-with-mobile-safe`,
-  RECOVERY: `${HELP_CENTER_URL}/en/articles/110656-account-recovery-in-safe-wallet`,
-  RELAYING: `${HELP_CENTER_URL}/en/articles/59203-what-is-gas-fee-sponsoring`,
-  SAFE_SETUP: `${HELP_CENTER_URL}/en/articles/40835-what-safe-setup-should-i-use`,
-  SIGNED_MESSAGES: `${HELP_CENTER_URL}/en/articles/40783-what-are-signed-messages`,
-  SPAM_TOKENS: `${HELP_CENTER_URL}/en/articles/40784-default-token-list-local-hiding-of-spam-tokens`,
-  SPENDING_LIMITS: `${HELP_CENTER_URL}/en/articles/40842-set-up-and-use-spending-limits`,
-  TRANSACTION_GUARD: `${HELP_CENTER_URL}/en/articles/40809-what-is-a-transaction-guard`,
-  UNEXPECTED_DELEGATE_CALL: `${HELP_CENTER_URL}/en/articles/40794-why-do-i-see-an-unexpected-delegate-call-warning-in-my-transaction`,
-  PROPOSERS: `${HELP_CENTER_URL}/en/articles/235770-proposers`,
-  PUSH_NOTIFICATIONS: `${HELP_CENTER_URL}/en/articles/99197-how-to-start-receiving-web-push-notifications-in-the-web-wallet`,
-  SWAP_WIDGET_FEES: `${HELP_CENTER_URL}/en/articles/178530-how-does-the-widget-fee-work-for-native-swaps`,
+  ADDRESS_BOOK_DATA: `${HELP_CENTER_SAFE}/en/articles/40811-address-book-export-and-import`,
+  ADVANCED_PARAMS: `${HELP_CENTER_SAFE}/en/articles/40837-advanced-transaction-parameters`,
+  CANCELLING_TRANSACTIONS: `${HELP_CENTER_SAFE}/en/articles/40836-why-do-i-need-to-pay-for-cancelling-a-transaction`,
+  COOKIES: `${HELP_CENTER_SAFE}/en/articles/40797-why-do-i-need-to-enable-third-party-cookies-for-safe-apps`,
+  CONFLICTING_TRANSACTIONS: `${HELP_CENTER_SAFE}/en/articles/40839-why-are-transactions-with-the-same-nonce-conflicting-with-each-other`,
+  FALLBACK_HANDLER: `${HELP_CENTER_SAFE}/en/articles/40838-what-is-a-fallback-handler-and-how-does-it-relate-to-safe`,
+  MOBILE_SAFE: `${HELP_CENTER_SAFE}/en/articles/40801-connect-to-web-with-mobile-safe`,
+  RECOVERY: `${HELP_CENTER_SAFE}/en/articles/110656-account-recovery-in-safe-wallet`,
+  RELAYING: `${HELP_CENTER_SAFE}/en/articles/59203-what-is-gas-fee-sponsoring`,
+  SAFE_SETUP: `${HELP_CENTER_SAFE}/en/articles/40835-what-safe-setup-should-i-use`,
+  SIGNED_MESSAGES: `${HELP_CENTER_SAFE}/en/articles/40783-what-are-signed-messages`,
+  SPAM_TOKENS: `${HELP_CENTER_SAFE}/en/articles/40784-default-token-list-local-hiding-of-spam-tokens`,
+  SPENDING_LIMITS: `${HELP_CENTER_SAFE}/en/articles/40842-set-up-and-use-spending-limits`,
+  TRANSACTION_GUARD: `${HELP_CENTER_SAFE}/en/articles/40809-what-is-a-transaction-guard`,
+  UNEXPECTED_DELEGATE_CALL: `${HELP_CENTER_SAFE}/en/articles/40794-why-do-i-see-an-unexpected-delegate-call-warning-in-my-transaction`,
+  PROPOSERS: `${HELP_CENTER_SAFE}/en/articles/235770-proposers`,
+  PUSH_NOTIFICATIONS: `${HELP_CENTER_SAFE}/en/articles/99197-how-to-start-receiving-web-push-notifications-in-the-web-wallet`,
+  SWAP_WIDGET_FEES: `${HELP_CENTER_SAFE}/en/articles/178530-how-does-the-widget-fee-work-for-native-swaps`,
 } as const
 export const HelperCenterArticleTitles = {
   RECOVERY: 'Learn more about the Account recovery process',

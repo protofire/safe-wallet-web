@@ -1,12 +1,14 @@
 diff --git a/node_modules/@safe-global/protocol-kit/dist/src/utils/eip-3770/config.js b/node_modules/@safe-global/protocol-kit/dist/src/utils/eip-3770/config.js
-index 00ae69d..1472b56 100644
+index 00ae69d..e0650e3 100644
 --- a/node_modules/@safe-global/protocol-kit/dist/src/utils/eip-3770/config.js
 +++ b/node_modules/@safe-global/protocol-kit/dist/src/utils/eip-3770/config.js
-@@ -111,6 +111,7 @@ exports.networks = [
+@@ -111,6 +111,9 @@ exports.networks = [
      { chainId: 1729n, shortName: 'reya' },
      { chainId: 1807n, shortName: 'rana' },
      { chainId: 1811n, shortName: 'lif3-testnet' },
-+    { chainId: 1868n, shortName: 'soneium' },
++    { chainId: 146n, shortName: 'sonic' },
++    { chainId: 130n, shortName: 'unichain' },
++    { chainId: 57073n, shortName: 'ink' },
      { chainId: 1890n, shortName: 'lightlink_phoenix' },
      { chainId: 1891n, shortName: 'lightlink_pegasus' },
      { chainId: 1984n, shortName: 'euntest' },
