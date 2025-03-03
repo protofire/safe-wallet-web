@@ -113,7 +113,7 @@ const Header = ({ onMenuToggle, onBatchToggle }: HeaderProps): ReactElement => {
 
       {safeAddress && (
         <div className={classnames(css.element, css.networkSelector)}>
-          <NetworkSelector offerSafeCreation showExternalChains />
+          <NetworkSelector offerSafeCreation />
         </div>
       )}
     </Paper>
