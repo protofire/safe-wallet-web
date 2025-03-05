@@ -1,6 +1,6 @@
 import { Box, useTheme } from '@mui/material'
 import css from './styles.module.css'
-import useSwapConsent from './useSwapConsent'
+import useLifiSwapConsent from './useLifiSwapConsent'
 import Disclaimer from '@/components/common/Disclaimer'
 import WidgetDisclaimer from '@/components/common/WidgetDisclaimer'
 import AppFrame from '@/components/safe-apps/AppFrame'
@@ -10,31 +10,56 @@ import type { MutableRefObject } from 'react'
 import { useEffect, useRef, useState } from 'react'
 import { useDarkMode } from '@/hooks/useDarkMode'
 import useSafeInfo from '@/hooks/useSafeInfo'
-import { ChainType } from '@lifi/types'
 import useChainId from '@/hooks/useChainId'
-import type { WidgetConfig } from './types/widget'
+import type { SplitSubvariant, WidgetConfig } from './types/widget'
+import React from 'react'
 
-const LifiSwapWidget = () => {
+type Params = {
+  sell?: {
+    // The token address
+    asset: string
+    amount: string
+    split?: SplitSubvariant
+  }
+}
+
+const LifiSwapWidget = ({ sell }: Params) => {
   const { palette } = useTheme()
   const darkMode = useDarkMode()
   const chainId = useChainId()
-  const { safeAddress, safeLoading } = useSafeInfo()
-  const { isConsentAccepted, onAccept } = useSwapConsent()
+  const { safeLoading } = useSafeInfo()
+  const { isConsentAccepted, onAccept } = useLifiSwapConsent()
 
-  const supportedChains = [42161, 10, 8453, 56, 11235, 59144, 81457]
+  //temp fix to quick check dark mode right after initial load
+  const checkDarkMode = () => {
+    const theme = document.documentElement.getAttribute('data-theme')
+    return theme === 'dark'
+  }
 
   const INITIAL_PARAMS: WidgetConfig = {
-    integrator: 'protofire',
+    integrator: 'protofire-safe',
+    fee: 0.005,
     variant: 'compact',
-    subvariant: 'default',
-    chains: { from: { allow: [+chainId] }, to: { allow: supportedChains } },
-    appearance: darkMode ? 'dark' : 'light',
-    toAddress: {
-      address: safeAddress,
-      chainType: ChainType.EVM,
+    subvariant: 'split',
+    subvariantOptions: {
+      split: sell?.split ?? 'swap',
     },
+    chains: { from: { allow: [+chainId] } },
+    appearance: darkMode || checkDarkMode() ? 'dark' : 'light',
+    theme: {
+      shape: {
+        borderRadius: 15,
+      },
+      container: {
+        boxShadow: '0px 8px 32px rgba(0, 0, 0, 0.08)',
+        borderRadius: '16px',
+        maxHeight: '96vh',
+      },
+    },
+    hiddenUI: ['walletMenu'],
     fromChain: +chainId,
     toChain: +chainId,
+    fromToken: sell?.asset,
   }
 
   const [params, setParams] = useState<WidgetConfig>(INITIAL_PARAMS)
@@ -55,6 +80,25 @@ const LifiSwapWidget = () => {
       iframeRef.current = iframeElement as HTMLIFrameElement
     }
   }, [isConsentAccepted, safeLoading])
+
+  useEffect(() => {
+    const handleIframeMessage = (event: MessageEvent) => {
+      const { type } = event.data
+      if (type === 'iframeReady') {
+        console.log('Parent: Iframe is ready')
+        const window = iframeRef.current?.contentWindow
+        if (window) {
+          window.postMessage(params, '*')
+        }
+      }
+    }
+
+    window.addEventListener('message', handleIframeMessage)
+
+    return () => {
+      window.removeEventListener('message', handleIframeMessage)
+    }
+  }, [])
 
   useEffect(() => {
     const window = iframeRef.current?.contentWindow
