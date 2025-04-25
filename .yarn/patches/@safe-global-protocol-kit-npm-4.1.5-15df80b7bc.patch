@@ -1,5 +1,5 @@
 diff --git a/dist/src/utils/eip-3770/config.js b/dist/src/utils/eip-3770/config.js
-index 4937a8edcfb3981d3974d2a0fa9bafdb92cde131..fd0beccaf8a61c1f101190e2a34c1cd103baac56 100644
+index 4937a8edcfb3981d3974d2a0fa9bafdb92cde131..7ee013190aa993131948a3013479bc0514f6b109 100644
 --- a/dist/src/utils/eip-3770/config.js
 +++ b/dist/src/utils/eip-3770/config.js
 @@ -51,8 +51,10 @@ exports.networks = [
@@ -13,3 +13,11 @@ index 4937a8edcfb3981d3974d2a0fa9bafdb92cde131..fd0beccaf8a61c1f101190e2a34c1cd1
      { chainId: 169n, shortName: 'manta' },
      { chainId: 177n, shortName: 'hsk' },
      { chainId: 179n, shortName: 'abey' },
+@@ -101,6 +103,7 @@ exports.networks = [
+     { chainId: 943n, shortName: 't4pls' },
+     { chainId: 970n, shortName: 'ccn' },
+     { chainId: 995n, shortName: '5ire' },
++    { chainId: 999n, shortName: 'hyper_evm' },
+     { chainId: 1001n, shortName: 'baobab' },
+     { chainId: 1008n, shortName: 'eun' },
+     { chainId: 1030n, shortName: 'cfx' },
