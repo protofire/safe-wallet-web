@@ -81,6 +81,15 @@
     margin-left: var(--space-2);
   }
 
+  .logoMobile a {
+    position: relative;
+  }
+
+  svg.logoMobileIcon {
+    display: block;
+    position: absolute;
+  }
+
   .menuButton {
     display: flex;
     flex: 0;
