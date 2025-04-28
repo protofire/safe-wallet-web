@@ -26,6 +26,7 @@ import { OVERVIEW_EVENTS, OVERVIEW_LABELS } from '@/services/analytics'
 import { useSafeTokenEnabled } from '@/hooks/useSafeTokenEnabled'
 //import useChainId from '@/hooks/useChainId'
 import ProtofireLogo from '@/public/images/protofire-logo.svg'
+import ProtofireMobileLogo from '@/public/images/protofire-mobile-logo.svg'
 
 type HeaderProps = {
   onMenuToggle?: Dispatch<SetStateAction<boolean>>
@@ -80,6 +81,7 @@ const Header = ({ onMenuToggle, onBatchToggle }: HeaderProps): ReactElement => {
 
       <div className={classnames(css.element, css.logoMobile)}>
         <Link href={logoHref} passHref>
+          <ProtofireMobileLogo inheritViewBox className={classnames(css.logoMobileIcon)} />
           <SafeLogoMobile alt="Safe logo" />
         </Link>
       </div>
