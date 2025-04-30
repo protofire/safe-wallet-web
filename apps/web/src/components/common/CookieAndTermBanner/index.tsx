@@ -47,7 +47,7 @@ export const CookieAndTermBanner = ({
   const dispatch = useAppDispatch()
   const cookies = useAppSelector(selectCookies)
 
-  const { getValues, setValue } = useForm({
+  const { register, watch, getValues, setValue } = useForm({
     defaultValues: {
       [CookieAndTermType.TERMS]: true,
       [CookieAndTermType.NECESSARY]: true,
@@ -139,7 +139,7 @@ export const CookieAndTermBanner = ({
                   />
                   <br />
                   <Typography variant="body2">New features and product announcements</Typography>
-                </Box>
+                </Box> */}
 
                 <Box>
                   <CookieCheckbox
@@ -151,7 +151,7 @@ export const CookieAndTermBanner = ({
                   <Typography variant="body2">
                     Opt in for Google Analytics cookies to help us analyze app usage patterns.
                   </Typography>
-                </Box> */}
+                </Box>
               </Grid>
             </Grid>
 
@@ -164,6 +164,13 @@ export const CookieAndTermBanner = ({
                 gap: 2,
               }}
             >
+              <Grid item>
+                <Typography>
+                  <Button onClick={handleAccept} variant="text" size="small" color="inherit" disableElevation>
+                    Save settings
+                  </Button>
+                </Typography>
+              </Grid>
               <Grid item>
                 <Button onClick={handleAcceptAll} variant="contained" color="secondary" size="small" disableElevation>
                   Accept all
