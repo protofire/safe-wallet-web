@@ -1,32 +1,36 @@
 diff --git a/dist/assets/allowance-module/v0.1.0/allowance-module.json b/dist/assets/allowance-module/v0.1.0/allowance-module.json
-index 25a409dc318ec0c0c16f7818ace7792f546e6313..fb16373d2baec68f5027834fc16c2f1665c8848a 100644
+index a4fe2e54016c024afb0f83648b1a68712659c94f..d220ff1c65dd087bf679dac2e1536315cc453d18 100644
 --- a/dist/assets/allowance-module/v0.1.0/allowance-module.json
 +++ b/dist/assets/allowance-module/v0.1.0/allowance-module.json
-@@ -15,6 +15,11 @@
-         "42220": "0xCFbFaC74C26F8647cBDb8c5caf80BB5b32E43134",
+@@ -16,7 +16,12 @@
          "43114": "0x1Fb403834C911eB98d56E74F5182b0d64C3b3b4D",
          "73799": "0xCFbFaC74C26F8647cBDb8c5caf80BB5b32E43134",
+         "80094": "0xCFbFaC74C26F8647cBDb8c5caf80BB5b32E43134",
+-        "11155111": "0xCFbFaC74C26F8647cBDb8c5caf80BB5b32E43134"
++        "11155111": "0xCFbFaC74C26F8647cBDb8c5caf80BB5b32E43134",
 +        "1112": "0xE46FE78DBfCa5E835667Ba9dCd3F3315E7623F8a",
 +        "1111": "0xE46FE78DBfCa5E835667Ba9dCd3F3315E7623F8a",
 +        "2358": "0xE46FE78DBfCa5E835667Ba9dCd3F3315E7623F8a",
 +        "255": "0xE46FE78DBfCa5E835667Ba9dCd3F3315E7623F8a",
-+        "168587773": "0xE46FE78DBfCa5E835667Ba9dCd3F3315E7623F8a",
-         "11155111": "0xCFbFaC74C26F8647cBDb8c5caf80BB5b32E43134"
++        "168587773": "0xE46FE78DBfCa5E835667Ba9dCd3F3315E7623F8a"
      },
      "abi": [
+         {
 diff --git a/dist/assets/allowance-module/v0.1.1/allowance-module.json b/dist/assets/allowance-module/v0.1.1/allowance-module.json
-index 8996b058503bd9de8a7ce0cc4445273011bcdb16..3e7b21716600d444aa30f4c0ed8061a1b8769c96 100644
+index 1d0b1d6e973183621204b22f370151094f2e2b8c..2e6bdb1f6db0b6068e99bbe2452da10db3461554 100644
 --- a/dist/assets/allowance-module/v0.1.1/allowance-module.json
 +++ b/dist/assets/allowance-module/v0.1.1/allowance-module.json
-@@ -4,6 +4,11 @@
-     "version": "0.1.1",
+@@ -5,7 +5,12 @@
      "networkAddresses": {
          "100": "0xAA46724893dedD72658219405185Fb0Fc91e091C",
+         "130": "0xAA46724893dedD72658219405185Fb0Fc91e091C",
+-        "137": "0xAA46724893dedD72658219405185Fb0Fc91e091C"
++        "137": "0xAA46724893dedD72658219405185Fb0Fc91e091C",
 +        "1112": "0xE46FE78DBfCa5E835667Ba9dCd3F3315E7623F8a",
 +        "1111": "0xE46FE78DBfCa5E835667Ba9dCd3F3315E7623F8a",
 +        "2358": "0xE46FE78DBfCa5E835667Ba9dCd3F3315E7623F8a",
 +        "255": "0xE46FE78DBfCa5E835667Ba9dCd3F3315E7623F8a",
-+        "168587773": "0xE46FE78DBfCa5E835667Ba9dCd3F3315E7623F8a",
-         "137": "0xAA46724893dedD72658219405185Fb0Fc91e091C"
++        "168587773": "0xE46FE78DBfCa5E835667Ba9dCd3F3315E7623F8a"
      },
      "abi": [
+         {
