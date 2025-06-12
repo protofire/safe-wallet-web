@@ -6,7 +6,7 @@ import { parsePrefixedAddress } from '@/utils/addresses'
 import useWallet from './wallets/useWallet'
 import useChains from './useChains'
 
-const defaultChainId = IS_PRODUCTION ? chains['kroma'] : chains['kroma-sepolia']
+const defaultChainId = IS_PRODUCTION ? chains.eth : chains.eth
 
 // Use the location object directly because Next.js's router.query is available only on mount
 const getLocationQuery = (): ParsedUrlQuery => {
