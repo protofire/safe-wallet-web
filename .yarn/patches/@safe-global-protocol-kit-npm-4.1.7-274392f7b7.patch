@@ -12,15 +12,16 @@ index d4c4940c14650f3bd1222fe1405fe2e8b83bb226..b5d960efae494195a17cd5479c6b2c2d
          const proxyAddress = zkSyncCreate2Address(from, safeVersion, salt, input);
          return safeProvider.getChecksummedAddress(proxyAddress);
 diff --git a/dist/src/utils/eip-3770/config.js b/dist/src/utils/eip-3770/config.js
-index 0a7a36bb93eda7a8c5f67e823cf4c76b8f7e2d0d..945b2aff6fc4a10546235f0b8c51ee66449f0653 100644
+index 0a7a36bb93eda7a8c5f67e823cf4c76b8f7e2d0d..2953c5bd89584ecc671382f6e73241d799116814 100644
 --- a/dist/src/utils/eip-3770/config.js
 +++ b/dist/src/utils/eip-3770/config.js
-@@ -3,6 +3,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
+@@ -3,6 +3,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
  exports.networks = void 0;
  // https://github.com/ethereum-lists/chains/tree/master/_data/chains
  exports.networks = [
 +    { chainId: 999n, shortName: 'hyper_evm' },
 +    { chainId: 1868n, shortName: 'soneium' },
++    { chainId: 9746n, shortName: 'plasma'},
      { chainId: 1n, shortName: 'eth' },
      { chainId: 3n, shortName: 'rop' },
      { chainId: 4n, shortName: 'rin' },
